@@ -1,0 +1,20 @@
+{
+  "name": "dmn_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "configuration": "npx tsc --showConfig",
+    "construction": "npx tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/C21111222/DMN_project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/C21111222/DMN_project/issues"
+  },
+  "homepage": "https://github.com/C21111222/DMN_project#readme"
+}
