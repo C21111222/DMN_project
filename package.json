@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/C21111222/DMN_project/issues"
   },
-  "homepage": "https://github.com/C21111222/DMN_project#readme"
+  "homepage": "https://github.com/C21111222/DMN_project#readme",
+  "dependencies": {
+    "dmn-js": "^14.6.0"
+  }
 }
