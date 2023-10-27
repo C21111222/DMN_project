@@ -3,21 +3,32 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "devDependencies": {
+    "@webpack-cli/generators": "^3.0.7",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.9.2"
+  },
   "scripts": {
-    "configuration": "npx tsc --showConfig",
-    "construction": "npx tsc"
+    "build": "tsc && npm run feelin_packaging",
+    "feelin_packaging": "webpack --config feelin.config.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/C21111222/DMN_project.git"
   },
-  "author": "",
+  "author": "Calmels Corentin",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/C21111222/DMN_project/issues"
   },
   "homepage": "https://github.com/C21111222/DMN_project#readme",
   "dependencies": {
-    "dmn-js": "^14.6.0"
+    "cacheable-request": "^10.2.14",
+    "dmn-js": "^14.6.0",
+    "feelin": "^1.2.0"
   }
 }

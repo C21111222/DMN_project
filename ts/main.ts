@@ -1,4 +1,8 @@
-const dropArea = document.getElementById('drop-area')!;
+
+
+declare const DmnJS : any
+
+const dropArea = document.getElementById('upload-area')!;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
 
 dropArea.addEventListener('dragover', (e) => {
@@ -22,11 +26,27 @@ fileInput.addEventListener('change', (e) => {
     handleFiles(files!);
 });
 
-function handleFiles(files: FileList) {
-    for (const file of files) {
-        // Faites quelque chose avec le fichier, par exemple :
-        console.log('Nom du fichier :', file.name);
-        console.log('Type de fichier :', file.type);
-        console.log('Taille du fichier :', file.size, 'octets');
-    }
+
+async function handleFiles(files: FileList) {
+
+
+    const file = files[0];
+    if (file.name.endsWith('.dmn')) {
+        const xml = await file.text();
+        const viewer = new DmnJS({
+            container: '#canvas'
+          });
+          
+          try {
+            const { warnings } = await viewer.importXML(xml);
+          
+            console.log('rendered');
+          } catch (err) {
+            console.log('error rendering', err)
+          }
+        }
+}
+
+function evaluateDMN(file : File){
+    
 }

@@ -6,11 +6,15 @@
    
 </head>
 <body>
-    <div id="drop-area">
-        <p>Drag and drop a file here or click to select one.</p>
+    <div id="upload-area">
         <input type="file" id="fileInput" style="display: none;">
+        <div id="upload-area" style="background-color: yellow; width: 200px; height: 100px;"> 
+            <p>Drag and Drop File Here</p>
+        </div>
     </div>
+    <div id="canvas" style="border: 1px solid black; width: 2000px; height: 1000px;">
+    </div>
+    <script src="./node_modules/dmn-js/dist/dmn-viewer.development.js"></script>
     <script src="js/main.js"></script>
-    
 </body>
 </html>
