@@ -1,7 +1,7 @@
 const path = require('path');
 module.exports = {
     devtool: 'source-map',
-    entry: './ts/feelin.ts',
+    entry: './ts/main.ts',
     mode: 'development',
     module: {
         rules: [
@@ -18,7 +18,7 @@ module.exports = {
         minimize: true
     },
     output: {
-        filename: 'feelin.js',
+        filename: 'main.js',
         path: path.resolve(__dirname, 'js'),
     },
     resolve: {
