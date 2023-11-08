@@ -32,8 +32,8 @@ async function handleFiles(files: FileList) {
   const file = files[0];
   if (file.name.endsWith('.dmn')) {
        const xml = await file.text();
-      const viewer = new DmnJS({
-       container: '#canvas'
+       const viewer = new DmnJS({
+       container: '#canvas',
          });
           
         try {
@@ -47,6 +47,10 @@ async function handleFiles(files: FileList) {
         } catch (err) {
           console.log('error rendering', err)
         }
+
+        // on affiche le tableau correspondant à la table de décision :
+        const table = document.getElementById("table");
+        
       }
 }
 
