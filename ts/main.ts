@@ -29,13 +29,6 @@ fileInput.addEventListener('change', (e) => {
 
 
 async function handleFiles(files: FileList) {
-  console.log("handleFiles");
-  for (const file of files) {
-        // Faites quelque chose avec le fichier, par exemple :
-        console.log('Nom du fichier :', file.name);
-        console.log('Type de fichier :', file.type);
-        console.log('Taille du fichier :', file.size, 'octets');
-  }
   const file = files[0];
   if (file.name.endsWith('.dmn')) {
        const xml = await file.text();

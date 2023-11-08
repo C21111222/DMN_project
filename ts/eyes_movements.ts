@@ -41,7 +41,7 @@ setTimeout(function() {
             let angle_left = Math.acos(adjacent_left/distance_left)
             let adjacent_right = Math.abs(x-X_right)
             let angle_right = Math.acos(adjacent_right/distance_right)
-            //Les angles sont en radians
+
             //On ajuste l'angle selon le plan
             if (delta_x_left>0 && delta_y_left<0) {
                 angle_left = 2*Math.PI - angle_left
@@ -62,8 +62,7 @@ setTimeout(function() {
             else if (delta_x_right<0 && delta_y_right<0) {
                 angle_right = Math.PI + angle_right
             }
-            //Les yeux se déplacent sur un cercle de centre X,Y et de taille 15px
-            //On à les coordonnées polaires, il suffit de les convertir en cartésiennes
+
             let max = 15
             if (distance_left>max) {
                 distance_left = max
@@ -71,12 +70,8 @@ setTimeout(function() {
             if (distance_right>max) {
                 distance_right = max
             }
-            let new_x_left = distance_left * Math.cos(angle_left) * -1
-            let new_y_left = distance_left * Math.sin(angle_left) * -1
-            let new_x_right = distance_right * Math.cos(angle_right) * -1
-            let new_y_right = distance_right * Math.sin(angle_right) * -1
-            right_eye.style.transform = "translate(" + new_x_right + "px," + new_y_right + "px)";
-            left_eye.style.transform = "translate(" + new_x_left + "px," + new_y_left + "px)";
+            right_eye.style.transform = "translate(" + distance_right * Math.cos(angle_right) * -1 + "px," + distance_right * Math.sin(angle_right) * -1 + "px)";
+            left_eye.style.transform = "translate(" + distance_left * Math.cos(angle_left) * -1 + "px," + distance_left * Math.sin(angle_left) * -1 + "px)";
         }
     }
     )
