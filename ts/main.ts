@@ -3,7 +3,7 @@ import { DMN_DecisionRule, DMN_DecisionTable, DMN_Definitions, DMN_InformationRe
 declare const DmnJS : any
 
 
-const dropArea = document.getElementById('upload-area')!;
+const dropArea = document.getElementById('mouth')!;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
 
 dropArea.addEventListener('dragover', (e) => {
@@ -29,27 +29,32 @@ fileInput.addEventListener('change', (e) => {
 
 
 async function handleFiles(files: FileList) {
-
-
-    const file = files[0];
-    if (file.name.endsWith('.dmn')) {
-        const xml = await file.text();
-        const viewer = new DmnJS({
-            container: '#canvas'
-          });
+  console.log("handleFiles");
+  for (const file of files) {
+        // Faites quelque chose avec le fichier, par exemple :
+        console.log('Nom du fichier :', file.name);
+        console.log('Type de fichier :', file.type);
+        console.log('Taille du fichier :', file.size, 'octets');
+  }
+  const file = files[0];
+  if (file.name.endsWith('.dmn')) {
+       const xml = await file.text();
+      const viewer = new DmnJS({
+       container: '#canvas'
+         });
           
-          try {
-            const { warnings } = await viewer.importXML(xml);
+        try {
+          const { warnings } = await viewer.importXML(xml);
           
-            console.log('rendered');
+          console.log('rendered');
 
-            readXML(file);  
+          readXML(file);  
 
 
-          } catch (err) {
-            console.log('error rendering', err)
-          }
+        } catch (err) {
+          console.log('error rendering', err)
         }
+      }
 }
 
 declare const DmnModdle : any;

@@ -3,19 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Drag and Drop File</title>
+    <link rel="stylesheet" href="css/monster.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/css_anim.css">
+
    
 </head>
 <body>
-    <div id="upload-area">
-        <input type="file" id="fileInput" style="display: none;">
-        <div id="upload-area" style="background-color: yellow; width: 200px; height: 100px;"> 
-            <p>Drag and Drop File Here</p>
+    <div> 
+        <div id="monster" >
+            <div id="eyes">
+                <div class="eye">
+                <div id="left_eye"></div>
+                </div>
+                <div class="eye">
+                <div id="right_eye"></div>
+                </div>
+            </div>
+            <div id="mouth">
+                <input type="file" id="fileInput" style="display: none;">
+                
+                    <p>Drag and Drop File Here</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="canvas" zqdsd style="border: 1px solid black; width: 2000px; height: 1000px;">
+    <div id="canvas" style="border: 1px solid black; width: 2000px; height: 1000px;">
     </div>
     <script src="./node_modules/dmn-js/dist/dmn-viewer.development.js"></script>
     <script type='module' src="js/main.js"></script>
+    <script src="js/eyes_movements.js"></script>
     <script src="./node_modules/dmn-moddle/dist/dmn-moddle.umd.js"></script>
 </body>
 </html>
