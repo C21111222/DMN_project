@@ -10,7 +10,13 @@
    
 </head>
 <body>
-    <div> 
+    <div id="screen">
+        <div id="top_bar">
+            <div id="top_bar_text">
+                <p id="title" >DMN viewer and evaluation</p>
+            </div>
+        </div> 
+    </div>
         <div id="monster" >
             <div id="eyes">
                 <div class="eye">
@@ -27,11 +33,18 @@
             </div>
         </div>
     </div>
-    <div id="canvas" style="border: 1px solid black; width: 1500px; height: 500px; ">
+    <div id="screen_data">
+        <div id="canvas">
+        </div>
     </div>
     <script src="./node_modules/dmn-js/dist/dmn-viewer.development.js"></script>
     <script type='module' src="js/main.js"></script>
     <script src="js/eyes_movements.js"></script>
     <script src="./node_modules/dmn-moddle/dist/dmn-moddle.umd.js"></script>
 </body>
+<footer id="footer">
+    <div id="footer_text">
+        <p>Created by <a href="https://github.com/C21111222">C21111222</a></p>
+    </div>
+</footer>
 </html>

@@ -29,26 +29,83 @@ div#top_bar {
     display:flex;
     align-items: center;
     justify-content: center;
+}
+
+div#canvas {
+    width:70vw;
+    height: 47vh;
+    background-color: rgb(240, 240, 240);
+    display:flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0px 3px 5px rgb(133, 133, 133);
 }
-#api_key {
-    width:500px;
-    height:30px;
-    text-align: center;
-    font-size: 18px;
+
+table.tjs-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 1em;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Cambria';
+    font-size: 16px;
 }
-#icons {
-    position: absolute;
-    right: 0;
+
+table.tjs-table tbody {
+    border: 1px solid #ccc;
+
+}
+
+div.powered-by {
+    display: none;
+}
+
+div.decision-table-name {
+    font-family: 'Cambria';
+    font-size: 20px;
+    font-weight: bold;
+}
+
+table.tjs-table thead {
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+}
+
+table.tjs-table th,
+table.tjs-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+footer {
+    width:100vw;
+    height: 80px;
+    background-color: var(--speech_border);
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px -3px 5px rgb(133, 133, 133);
+}
+
+div#footer_text {
     display: flex;
     align-items: center;
-    gap:30px;
-    background-color: var(--speech_color);
-    height: 90px;
-    padding-right: 30px;
-    padding-left: 50px;
-    border-top-left-radius: 70px;
-    box-sizing: border-box;
+    justify-content: center;
+    background-color: var(--speech_border);
+    gap: 20px;
+    font-family: 'Cambria';
+
+}
+p#title {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--speech_color);
 }
 div.speech {
     box-sizing: border-box;
