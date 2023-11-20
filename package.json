@@ -30,6 +30,7 @@
   "homepage": "https://github.com/C21111222/DMN_project#readme",
   "dependencies": {
     "cacheable-request": "^10.2.14",
+    "dmn-engine": "^1.0.6",
     "dmn-js": "^14.6.0",
     "feelin": "^1.2.0"
   }

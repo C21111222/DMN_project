@@ -1,7 +1,7 @@
 
 import { DMN_DecisionRule, DMN_DecisionTable, DMN_Definitions, DMN_InformationRequirement, DMN_data, DMN_file, ModdleElement, Set_current_diagram, is_DMN_Definitions, is_DMN_Decision, is_DMN_InputData } from "./DMN-JS";
 declare const DmnJS : any
-
+declare const DmnEngine : any
 
 const dropArea = document.getElementById('mouth')!;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
@@ -43,8 +43,9 @@ async function handleFiles(files: FileList) {
           const { warnings } = await viewer.importXML(xml);
           
           console.log('rendered');
-
-          readXML(file);  
+          // on creer une variable de test json avec un seul attribut age!
+          const json = { age: 18 };
+          evaluateWithDmn(json,file);  
 
 
         } catch (err) {
@@ -57,33 +58,21 @@ async function handleFiles(files: FileList) {
       }
 }
 
-declare const DmnModdle : any;
+function evaluateWithDmn(jsonData: any, dmnXml: any) {
+  try {
+    // Créez une instance de DMN Engine
+    const dmnEngine = new DmnEngine();
 
-async function readXML(file: File) {
-  let dmn_data: DMN_data|null = null;
-  const dmnModdle = new DmnModdle();
-  const xml = await file.text();
-  const file_name = file.name;
-  const dmn_file: DMN_file = {file_name, file_content: xml};
-  
-  const reader = await dmnModdle.fromXML(xml);
-  const me: ModdleElement = reader.rootElement;
-  dmn_data = {...dmn_file, me: me}
+    // Chargez la table de décision DMN
+    dmnEngine.parse(dmnXml);
 
-  Set_current_diagram(dmn_file, dmn_data);
-  console.log("dmn_data");
-  console.log(dmn_data);
-  console.log("dmn_data.me");
-  console.log(dmn_data.me);
-  // on affiche les attributs de la racine du graphe d'héritage de 'dmn-moddle' :
-  console.log("dmn_data.me.$attrs");
-  console.log(dmn_data.me!.$attrs);
-  console.log("is DMN_Definitions");
-  console.log(is_DMN_Definitions(dmn_data.me!));
-  if (is_DMN_Definitions(dmn_data.me)){
-    console.log("drg in DMN_Definitions");
-    const def : DMN_Definitions = dmn_data.me;
-    console.log(def.drgElement);
+    // Évaluez les données JSON
+    const result = dmnEngine.evaluate(jsonData);
+
+    // Traitez le résultat selon vos besoins
+    console.log('Résultat de l\'évaluation DMN :', result);
+  } catch (error) {
+    console.error('Une erreur s\'est produite lors de l\'évaluation DMN :', error);
   }
 }
 
