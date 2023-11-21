@@ -1,7 +1,7 @@
 
-import { DMN_DecisionRule, DMN_DecisionTable, DMN_Definitions, DMN_InformationRequirement, DMN_data, DMN_file, ModdleElement, Set_current_diagram, is_DMN_Definitions, is_DMN_Decision, is_DMN_InputData } from "./DMN-JS";
+import { DMN_DecisionRule, DMN_Decision, DMN_DecisionTable, DMN_Definitions, DMN_InformationRequirement, DMN_data, DMN_file, ModdleElement, Set_current_diagram, is_DMN_Definitions, is_DMN_Decision, is_DMN_InputData } from "./DMN-JS";
 declare const DmnJS : any
-declare const DmnEngine : any
+declare const DmnModdle: any;
 
 const dropArea = document.getElementById('mouth')!;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
@@ -45,7 +45,8 @@ async function handleFiles(files: FileList) {
           console.log('rendered');
           // on creer une variable de test json avec un seul attribut age!
           const json = { age: 18 };
-          evaluateWithDmn(json,file);  
+          const decisionTable = new DecisionTable(file);
+          
 
 
         } catch (err) {
@@ -58,25 +59,111 @@ async function handleFiles(files: FileList) {
       }
 }
 
-function evaluateWithDmn(jsonData: any, dmnXml: any) {
-  try {
-    // Créez une instance de DMN Engine
-    const dmnEngine = new DmnEngine();
 
-    // Chargez la table de décision DMN
-    dmnEngine.parse(dmnXml);
 
-    // Évaluez les données JSON
-    const result = dmnEngine.evaluate(jsonData);
 
-    // Traitez le résultat selon vos besoins
-    console.log('Résultat de l\'évaluation DMN :', result);
-  } catch (error) {
-    console.error('Une erreur s\'est produite lors de l\'évaluation DMN :', error);
+
+
+const dmnModdle = new DmnModdle();
+let dmn_data: DMN_data|null = null;
+
+async function readXML(file: File) {
+  const xml = await file.text();
+  const file_name = file.name;
+  const dmn_file: DMN_file = {file_name, file_content: xml};
+  
+  const reader = await dmnModdle.fromXML(xml);
+  const me: ModdleElement = reader.rootElement;
+  dmn_data = {...dmn_file, me: me}
+
+  Set_current_diagram(dmn_file, dmn_data);
+  // si c'est un DMN_Definitions :
+  if (is_DMN_Definitions(dmn_data!.me)) {
+    const elements = dmn_data!.me.drgElement;
+    console.log(elements);
+    // on affiche les éléments du DRG :
+    for (const element of elements) {
+      console.log(element);
+      // si c'est un DMN_Decision :
+      if (is_DMN_Decision(element)){
+        // cast en DMN_Decision :
+        const decision = element as DMN_Decision;
+        const rules = decision.decisionLogic?.rule;
+        console.log(rules);
+      }
+    }
   }
+
 }
 
+export class DecisionTable {
+  private dmnModdle = new DmnModdle();
+  private dmn_data: DMN_data|null = null;
+  constructor(
+    public file: File,
+  ) {
+    (async () => {
+      const xml = await file.text();
+      const file_name = file.name;
+      const dmn_file: DMN_file = {file_name, file_content: xml};
+      
+      const reader = await this.dmnModdle.fromXML(xml);
+      const me: ModdleElement = reader.rootElement;
+      this.dmn_data = {...dmn_file, me: me}
+
+      Set_current_diagram(dmn_file, dmn_data);
+      this.define_input_data();
+    })();
+  }
+
+  private define_input_data() {
+    // on récupère les DMN_InputData :
+    const input_data = is_DMN_Definitions(this.dmn_data!.me) ? this.dmn_data!.me.drgElement.filter(is_DMN_InputData) : [];
+    console.log(input_data);
+    // on les affiche dans le tableau :
+    const table_div = document.getElementById("input_data_table") as HTMLTableElement;
+    if (table_div) {
+      // on affiche les data en entrée attendues :
+      // on crée l'entête du tableau td et th :
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      const thead = document.createElement("thead");
+      const table = document.createElement("table");
+      th.innerHTML = "Input Data";
+      tr.appendChild(th);
+      thead.appendChild(tr);
+      table.appendChild(thead);
+      table_div.appendChild(table);
+
+      const tr1 = document.createElement("tr");
+      const td1 = document.createElement("td");
+      td1.innerHTML = "Data name";
+      tr1.appendChild(td1);
+      table.appendChild(tr1);
+
+      const tr2 = document.createElement("tr");
+      const td2 = document.createElement("td");
+      td2.innerHTML = "Data type";
+      tr2.appendChild(td2);
+      table.appendChild(tr2);
+      // on affiche les données en entrée, leur nom et leur type :
+      for (const data of input_data) {
+
+        const tr1 = document.createElement("tr");
+        const td1 = document.createElement("td");
+        td1.innerHTML = data.name!;
+        tr1.appendChild(td1);
+
+
+        const td2 = document.createElement("td");
+        td2.innerHTML = data.variable.typeRef!;
+        tr1.appendChild(td2);
+        table.appendChild(tr1);
+      }
+    }
+  }
 
 
 
 
+}
