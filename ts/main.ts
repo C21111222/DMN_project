@@ -82,4 +82,5 @@ async function handleFiles(files: FileList) {
         console.log(result);
       }
     }
+  }
 }

@@ -18,7 +18,10 @@ div#screen {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+
 }
+
 
 div#input_data_table {
     width: 30%;
@@ -33,9 +36,26 @@ div#input_data_table {
     margin-bottom: 25px;
     margin-top: 25px;
     position: relative;
-    float: right;
+    float: left;
 }
-div#input_data_table_text {
+
+div#output_data_table {
+    width: 30%;
+    height: 20vh;
+    background-color: rgb(180, 170, 170);
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 3px 5px rgb(133, 133, 133);
+    border-radius: 25px;
+    border: 3px solid var(--speech_border);
+    margin-bottom: 25px;
+    margin-top: 25px;
+    position: relative;
+    float: right;
+    display: none;
+}
+div.table_text {
     /* placé en haut à gauche de la div parent (input_data_table) */
     justify-content: flex-start;
     align-items: flex-start;
@@ -61,15 +81,7 @@ div#top_bar {
     justify-content: center;
 }
 
-div#canvas {
-    width:70vw;
-    height: 47vh;
-    background-color: rgb(240, 240, 240);
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0px 3px 5px rgb(133, 133, 133);
-}
+
 
 table.tjs-table {
     border-collapse: collapse;
@@ -113,6 +125,46 @@ table.tjs-table td {
     border: 1px solid #ccc;
 }
 
+div#screen_data {
+    width: 70vw;
+    height: 47vh;
+    background-color: rgb(240, 240, 240);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  div#top_bar_data {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30%;
+    padding: 10px;
+    border-radius: 25px;
+    background-color: rgba(240, 240, 240, 0.692);
+
+    border: 3px solid var(--speech_border);
+
+  }
+  
+  div#canvas {
+    position: absolute;
+    top: 45px;
+    width: 100%;
+    height: calc(49vh - 50px); /* Subtract the height of the top bar from the height of the screen data */
+    background-color: rgb(240, 240, 240);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+  
+div#title_data {
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
 footer {
     width:100vw;
     height: 80px;

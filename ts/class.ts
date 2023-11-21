@@ -33,15 +33,7 @@ export class Data_display {
       if (table_div) {
         // on affiche les data en entrée attendues :
         // on crée l'entête du tableau td et th :
-        const tr = document.createElement("tr");
-        const th = document.createElement("th");
-        const thead = document.createElement("thead");
         const table = document.createElement("table");
-        th.innerHTML = "Input Data";
-        tr.appendChild(th);
-        thead.appendChild(tr);
-        table.appendChild(thead);
-        table_div.appendChild(table);
   
         const tr1 = document.createElement("tr");
         const td1 = document.createElement("td");
@@ -64,6 +56,38 @@ export class Data_display {
         }
       }
       
+    }
+
+    public display_result(json: any) {
+        // on affiche le résultat dans le tableau :
+        const table_div = document.getElementById("output_data_table") as HTMLTableElement;
+        if (table_div) {
+            // on crée l'entête du tableau td et th :
+            const table = document.createElement("table");
+      
+            const tr1 = document.createElement("tr");
+            const td1 = document.createElement("td");
+            td1.innerHTML = "Data name";
+            tr1.appendChild(td1);
+            const td2 = document.createElement("td");
+            td2.innerHTML = "Data value";
+            tr1.appendChild(td2);
+            table.appendChild(tr1);
+            // on affiche les données en entrée, leur nom et leur type :
+            for (const data of this.decision_table.dmn_input_data) {
+              const tr1 = document.createElement("tr");
+              const td1 = document.createElement("td");
+              td1.innerHTML = data.name!;
+              tr1.appendChild(td1);
+              const td2 = document.createElement("td");
+              td2.innerHTML = json[data.name!];
+              tr1.appendChild(td2);
+              table.appendChild(tr1);
+            }
+            table_div.appendChild(table);
+            //on met la propriete display à block pour afficher le tableau :
+            table_div.style.display = "block";
+        }
     }
 
     public delete_display() {
@@ -144,26 +168,22 @@ export class Data_display {
                 });
             }
         }
-        );
-
-
-        
+        );  
     }
-
   }
   
-  export class Current_run {
-    public decision_table?: DecisionTable;
-    public data_input?: any;
-    public data_display?: Data_display;
+export class Current_run {
+  public decision_table?: DecisionTable;
+  public data_input?: any;
+  public data_display?: Data_display;
 
-    constructor(
-      public current_run : boolean = false,
-    ) {}
+  constructor(
+    public current_run : boolean = false,
+  ) {}
 
-    public delete_display() {
-        this.data_display!.delete_display();
-    }
+  public delete_display() {
+    this.data_display!.delete_display();
   }
+}
   
   
