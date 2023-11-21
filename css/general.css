@@ -32,7 +32,23 @@ div#input_data_table {
     border: 3px solid var(--speech_border);
     margin-bottom: 25px;
     margin-top: 25px;
+    position: relative;
     float: right;
+}
+div#input_data_table_text {
+    /* placé en haut à gauche de la div parent (input_data_table) */
+    justify-content: flex-start;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 25px;
+    background-color: rgba(240, 240, 240, 0.692);
+    box-shadow: 5px 5px 8px rgb(133, 133, 133);
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 

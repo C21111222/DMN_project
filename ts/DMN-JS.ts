@@ -78,6 +78,10 @@ export interface DMN_DecisionTable extends ModdleElement {
     rule: Array<DMN_DecisionRule>;
 }
 
+export function is_DMN_DecisionTable(me: ModdleElement): me is DMN_DecisionTable {
+    return '$type' in me && me.$type === _DMN_DecisionTable && 'rule' in me;
+}
+
 export interface DMN_DecisionRule extends ModdleElement {
     $type: typeof _DMN_DecisionRule;
     description: string;
