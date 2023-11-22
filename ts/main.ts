@@ -8,11 +8,16 @@ export class DecisionTable {
   private dmnModdle = new DmnModdle();
   public dmn_data: DMN_data|null = null;
   public dmn_input_data: Input_data[] = [];
+  public is_init: boolean = false;
 
   constructor(public file: File) {
-    this.define_dmn_data().then(() => {
-      this.define_input_data();
-    });
+  }
+
+  public async init() {
+    await this.define_dmn_data();
+    await this.define_input_data();
+    this.is_init = true;
+
   }
 
   private async define_dmn_data() {
@@ -22,21 +27,35 @@ export class DecisionTable {
     
     const reader = await this.dmnModdle.fromXML(xml);
     const me: ModdleElement = reader.rootElement;
-    this.dmn_data = {...dmn_file, me: me}
-
-    Set_current_diagram(dmn_file, this.dmn_data);
+    this.dmn_data = {...dmn_file, me: me};
   }
 
-  private define_input_data() {
-    // on récupère les DMN_InputData :
-    const input_data = is_DMN_Definitions(this.dmn_data!.me) ? this.dmn_data!.me.drgElement.filter(is_DMN_InputData) : [];
-    this.dmn_input_data = input_data.map((input) => {
-      const name = input.name!;
-      const type = input.variable.typeRef!;
-      return new Input_data(name, type);
+  private recur_get_input_data(drg_element: ModdleElement, res : Input_data[] = []): Input_data[] {
+    // on parcourt les DRGElement jusqu'à trouver un DRGElement de DMN_InputData :
+    console.log(drg_element);
+   if (is_DMN_InputData(drg_element)) {
+      const name = drg_element.name!;
+      const type = drg_element.variable.typeRef!;
+      res.push(new Input_data(name, type));
+      return res;
+
+    } else if (is_DMN_Definitions(drg_element)) {
+      const drg_elements = drg_element.drgElement;
+      drg_elements.forEach((drg_element) => {
+        this.recur_get_input_data(drg_element, res);
+      });
+      return res;
+    } else {
+      return res;
     }
-    );
-    
+  }
+
+
+  private async define_input_data() {
+    // on récupère les DMN_InputData :
+    const input_data = this.recur_get_input_data(this.dmn_data!.me);
+    this.dmn_input_data = input_data;
+    console.log(this.dmn_input_data);  
   }
 
   private define_rules() {
@@ -47,6 +66,9 @@ export class DecisionTable {
   }
 
   public eval(json: any) {
+    if (this.is_init == false) {
+      this.init();
+    }
       //on verifie que les données en entrée sont bien celles attendues :
       // pour chaque donnée en entrée, on vérifie que le nom et le type correspondent à ceux attendus :
       this.dmn_input_data.forEach((input_data) => {
@@ -88,9 +110,15 @@ export class Data_display {
       public file: File
     ) {
       this.decision_table = new DecisionTable(file);
+      this.init();
+    }
+
+    private async init() {
       this.display_table();
+      await this.decision_table.init();
       this.display_input_data();
     }
+    
   
     private async display_table() {
       const xml = await this.file.text();
@@ -110,13 +138,15 @@ export class Data_display {
       const table_div = document.getElementById("input_data_table") as HTMLTableElement;
       if (table_div) {
         const table = document.createElement("table");
+        // on ajoute la class data
+        table.classList.add("data");
   
         const tr1 = document.createElement("tr");
         const td1 = document.createElement("td");
-        td1.innerHTML = "Data name";
+        td1.innerHTML = "name";
         tr1.appendChild(td1);
         const td2 = document.createElement("td");
-        td2.innerHTML = "Data type";
+        td2.innerHTML = "type";
         tr1.appendChild(td2);
         table.appendChild(tr1);
         // on affiche les données en entrée, leur nom et leur type :
@@ -177,12 +207,12 @@ export class Data_display {
   
   
   
-  export class Input_data {
+export class Input_data {
     constructor(
       public name: string,
       public type: string,
     ) {}
-  }
+}
   
   
 

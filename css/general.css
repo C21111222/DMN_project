@@ -22,6 +22,25 @@ div#screen {
 
 }
 
+/* tableau de données avec les lignes de couleur noire entre chaque ligne */
+table.data {
+
+    width: 60%;
+    margin-bottom: 1em;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Cambria';
+    font-size: 16px;
+}
+
+/* Style pour les cellules du tableau */
+table.data td {
+    border: 1px solid #2e2c2c; /* Ajout d'une bordure aux cellules */
+    padding: 8px; /* Ajout d'un espace intérieur aux cellules */
+}
+
 
 div#input_data_table {
     width: 30%;
