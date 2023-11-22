@@ -4,6 +4,21 @@ import {unaryTest} from "feelin";
 declare const DmnJS : any
 declare const DmnModdle: any;
 
+export class Current_run {
+  public decision_table?: DecisionTable;
+  public data_input?: any;
+  public data_display?: Data_display;
+
+  constructor(
+    public current_run : boolean = false,
+  ) {}
+
+  public delete_display() {
+    this.data_display!.delete_display();
+  }
+}
+  
+
 export class Data_display {
     private decision_table: DecisionTable;
     constructor(
@@ -172,18 +187,5 @@ export class Data_display {
     }
   }
   
-export class Current_run {
-  public decision_table?: DecisionTable;
-  public data_input?: any;
-  public data_display?: Data_display;
 
-  constructor(
-    public current_run : boolean = false,
-  ) {}
-
-  public delete_display() {
-    this.data_display!.delete_display();
-  }
-}
-  
   
