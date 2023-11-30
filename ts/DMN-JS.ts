@@ -26,6 +26,15 @@ export interface ModdleElement { // Racine du graphe d'héritage de 'dmn-moddle'
     $attrs?: Object;
 }
 
+
+export interface ExtendedModdleElement extends ModdleElement {
+    drgElement?: ModdleElement[]; // Assuming drgElement is an optional array of ModdleElement
+  }
+
+export function is_ExtendedModdleElement(me: ModdleElement): me is ExtendedModdleElement {
+    return 'drgElement' in me;
+}
+
 // https://docs.camunda.org/manual/7.18/user-guide/dmn-engine/data-types/#supported-data-types
 type _DMN_type_reference = 'boolean' | 'date' | 'double' | 'integer' | 'long' | 'string';
 // On simplifie pour le moment :
@@ -164,6 +173,9 @@ export interface DMN_LiteralExpression extends ModdleElement {
     typeRef?: _DMN_type_reference;
 }
 
+export function is_DMN_LiteralExpression(me: ModdleElement): me is DMN_LiteralExpression {
+    return '$type' in me && me.$type === _DMN_LiteralExpression;
+}
 export interface DMN_OutputClause extends ModdleElement {
     $type: typeof _DMN_OutputClause;
     label: string;
