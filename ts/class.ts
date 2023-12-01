@@ -20,6 +20,7 @@ export class DecisionTable {
     await this.define_input_data();
     await this.define_output_data();
     this.is_init = true;
+    console.log(this.define_rules());
 
   }
 
