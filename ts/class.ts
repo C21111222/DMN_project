@@ -41,10 +41,19 @@ export class DecisionTable {
     const xml = await this.file.text();
     const file_name = this.file.name;
     const dmn_file: DMN_file = { file_name, file_content: xml };
-
-    const reader = await this.dmnModdle.fromXML(xml);
-    const me: ModdleElement = reader.rootElement;
-    this.dmn_data = { ...dmn_file, me: me };
+    try {
+      const reader = await this.dmnModdle.fromXML(xml);
+      const me: ModdleElement = reader.rootElement;
+      this.dmn_data = { ...dmn_file, me: me };
+    } catch (error) {
+      //  use sweetalert2 to display the error
+      const swal = require("sweetalert2");
+      swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "The DMN file is not valid!",
+      });
+    }
   }
 
   private recur_get_input_data(
