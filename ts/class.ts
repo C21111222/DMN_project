@@ -4,13 +4,9 @@ import {
   is_DMN_LiteralExpression,
   is_ExtendedModdleElement,
   DMN_Decision,
-  DMN_DecisionTable,
-  DMN_Definitions,
-  DMN_InformationRequirement,
   DMN_data,
   DMN_file,
   ModdleElement,
-  Set_current_diagram,
   is_DMN_Definitions,
   is_DMN_Decision,
   is_DMN_InputData,
@@ -146,6 +142,14 @@ export class DecisionTable {
     if (this.dmn_data && this.dmn_data.me) {
       const output_data = this.recur_get_output_data(this.dmn_data.me);
       this.dmn_output_data = output_data;
+      if (this.dmn_output_data.length === 1 && this.dmn_output_data[0].name === undefined) {
+        const swal = require("sweetalert2");
+        swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "The DMN file is not valid!",
+        });
+      }
     } else {
       // Handle the case where dmn_data or dmn_data.me is not available
       console.error("DMN data is not initialized.");

@@ -29,9 +29,6 @@ fileInput.addEventListener("change", (e) => {
 
 async function handleFiles(files: FileList) {
   const file = files[0];
-  // on supprime le contenu de la zone de dessin :
-  const canvas = document.getElementById("canvas");
-  canvas!.innerHTML = "";
   if (file.name.endsWith(".dmn")) {
     if (current_run.current_run == false) {
       current_run.current_run = true;
