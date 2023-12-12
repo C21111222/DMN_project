@@ -16,6 +16,17 @@ import { unaryTest } from "feelin";
 declare const DmnJS: any;
 declare const DmnModdle: any;
 
+/**
+ * Represents a DMN file.
+ * 
+ * @property dmn_data - The DMN data.
+ * @property dmn_input_data - The input data.
+ * @property dmn_output_data - The output data.
+ * @property is_init - Indicates if the DMN data is initialized.
+ * @property dmnModdle - The DMN moddle.
+* @property file - The file object.
+  
+ */
 export class DecisionTable {
   private dmnModdle = new DmnModdle();
   public dmn_data: DMN_data | null = null;
@@ -25,6 +36,12 @@ export class DecisionTable {
 
   constructor(public file: File) {}
 
+  /**
+   * Initializes the class by defining DMN data, input data, and output data.
+   * Sets the `is_init` flag to true.
+   * Logs the result of defining rules.
+   * @returns {Promise<void>} A promise that resolves when initialization is complete.
+   */
   public async init() {
     await this.define_dmn_data();
     await this.define_input_data();
@@ -33,6 +50,10 @@ export class DecisionTable {
     console.log(this.define_rules());
   }
 
+  /**
+   * Defines the DMN data by parsing the XML content of the file.
+   * @returns {Promise<void>} A promise that resolves when the DMN data is defined.
+   */
   private async define_dmn_data() {
     const xml = await this.file.text();
     const file_name = this.file.name;
@@ -52,6 +73,13 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Recursively retrieves input data from a DRG element.
+   * 
+   * @param drg_element The DRG element to retrieve input data from.
+   * @param res The array to store the retrieved input data.
+   * @returns An array of input data.
+   */
   private recur_get_input_data(
     drg_element: ExtendedModdleElement,
     res: Input_data[] = [],
@@ -66,6 +94,12 @@ export class DecisionTable {
     return res;
   }
 
+  /**
+   * Extracts input data from a DMN decision.
+   * 
+   * @param decision - The DMN decision object.
+   * @param res - The array to store the extracted input data.
+   */
   private extractInputDataFromDecision(
     decision: DMN_Decision,
     res: Input_data[],
@@ -78,6 +112,12 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Extracts input data from the input clause.
+   * 
+   * @param input_clause - The input clause object.
+   * @param res - The array to store the extracted input data.
+   */
   private extractInputDataFromClause(
     input_clause: any,
     res: Input_data[],
@@ -93,6 +133,11 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Defines the input data for the DMN project.
+   * 
+   * @returns A Promise that resolves when the input data is defined.
+   */
   private async define_input_data(): Promise<void> {
     if (this.dmn_data && this.dmn_data.me) {
       const input_data = this.recur_get_input_data(this.dmn_data.me);
@@ -103,6 +148,13 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Recursively retrieves output data from a DRG element.
+   * 
+   * @param drg_element The DRG element to process.
+   * @param res The array to store the output data.
+   * @returns An array of output data.
+   */
   private recur_get_output_data(
     drg_element: ExtendedModdleElement,
     res: Input_data[] = [],
@@ -117,6 +169,12 @@ export class DecisionTable {
     return res;
   }
 
+  /**
+   * Extracts output data from a DMN decision.
+   * 
+   * @param decision - The DMN decision to extract output data from.
+   * @param res - The input data array.
+   */
   private extractOutputDataFromDecision(
     decision: DMN_Decision,
     res: Input_data[],
@@ -129,6 +187,12 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Extracts output data from the given output clause and adds it to the provided array.
+   * 
+   * @param output_clause - The output clause to extract data from.
+   * @param res - The array to add the extracted data to.
+   */
   private extractOutputDataFromClause(
     output_clause: any,
     res: Input_data[],
@@ -138,6 +202,11 @@ export class DecisionTable {
     res.push(new Input_data(name, type));
   }
 
+  /**
+   * Defines the output data for the DMN project.
+   * 
+   * @returns A Promise that resolves when the output data is defined.
+   */
   private async define_output_data(): Promise<void> {
     if (this.dmn_data && this.dmn_data.me) {
       const output_data = this.recur_get_output_data(this.dmn_data.me);
@@ -156,6 +225,10 @@ export class DecisionTable {
     }
   }
 
+  /**
+   * Defines the rules for the DMN project.
+   * @returns {Array} An array of rules.
+   */
   private define_rules() {
     const decision = is_DMN_Definitions(this.dmn_data!.me)
       ? this.dmn_data!.me.drgElement.filter(is_DMN_Decision)
@@ -169,6 +242,12 @@ export class DecisionTable {
     return rules;
   }
 
+  /**
+   * Evaluates the given JSON data against the defined rules and returns the result based on the hit policy.
+   * @param json The JSON data to be evaluated.
+   * @returns A promise that resolves to the result of the evaluation.
+   * @throws {Error} If the hit policy is violated or not recognized.
+   */
   public async eval(json: any): Promise<Record<string, any>> {
     if (!this.is_init) {
       await this.init();
@@ -223,6 +302,11 @@ export class DecisionTable {
   return {};
   }
   
+    /**
+     * Retrieves the hit policy of the DMN decision table.
+     * 
+     * @returns The hit policy of the DMN decision table, or an empty string if the DMN data is not initialized.
+     */
     private getHitPolicy(): string {
       if (this.dmn_data && this.dmn_data.me) {
         const decision = is_DMN_Definitions(this.dmn_data.me)
@@ -241,30 +325,63 @@ export class DecisionTable {
         return "";
       }
     }
-  }
+}
 
 
 
+/**
+ * Represents the current run of a process.
+ */
 export class Current_run {
+  /**
+   * The decision table associated with the current run.
+   */
   public decision_table?: DecisionTable;
+  
+  /**
+   * The input data for the current run.
+   */
   public data_input?: any;
+  
+  /**
+   * The data display for the current run.
+   */
   public data_display?: Data_display;
 
+  /**
+   * Creates a new instance of the Current_run class.
+   * @param current_run - Indicates if the current run is active or not.
+   */
   constructor(public current_run: boolean = false) {}
 
+  /**
+   * Deletes the data display for the current run.
+   */
   public delete_display() {
     this.data_display!.delete_display();
   }
 }
 
+/**
+ * Represents a class for displaying data in a decision table.
+ */
 export class Data_display {
   private decision_table: DecisionTable;
 
+  /**
+   * Creates an instance of the class.
+   * @param file The file object.
+   */
   constructor(public file: File) {
     this.decision_table = new DecisionTable(file);
     this.init();
   }
 
+  /**
+   * Initializes the class by displaying the table, initializing the decision table,
+   * and displaying the input and output data.
+   * @returns {Promise<void>} A promise that resolves when the initialization is complete.
+   */
   private async init() {
     await this.display_table();
     await this.decision_table.init();
@@ -272,6 +389,10 @@ export class Data_display {
     this.display_output_data();
   }
 
+  /**
+   * Displays the table by importing and rendering the DMN XML.
+   * @returns {Promise<void>} A promise that resolves when the table is displayed.
+   */
   private async display_table() {
     const xml = await this.file.text();
     const viewer = new DmnJS({ container: "#canvas" });
@@ -287,6 +408,9 @@ export class Data_display {
     }
   }
 
+  /**
+   * Displays the input data table on the page.
+   */
   private display_input_data() {
     const table_div = document.getElementById("input_data_table");
     if (!table_div) {
@@ -301,6 +425,13 @@ export class Data_display {
     table_div.appendChild(table);
   }
 
+  /**
+   * Creates an HTML table element with the specified headers and rows.
+   * 
+   * @param headers - An array of strings representing the table headers.
+   * @param rows - An array of arrays of strings representing the table rows.
+   * @returns The created HTMLTableElement.
+   */
   private createTable(headers: string[], rows: string[][]): HTMLTableElement {
     const table = document.createElement("table");
     table.classList.add("data");
@@ -325,6 +456,9 @@ export class Data_display {
     return table;
   }
 
+  /**
+   * Displays the output data of the decision table.
+   */
   public display_output_data() {
     console.log(this.decision_table.dmn_output_data);
     const table_div = document.getElementById("output_data_table");
@@ -341,6 +475,10 @@ export class Data_display {
     table_div.style.display = "block";
   }
 
+  /**
+   * Displays the result in the table.
+   * @param json - The JSON object containing the data values.
+   */
   public display_result(json: any) {
     // on affiche le résultat dans le tableau :
     const table_div = document.getElementById(
@@ -374,12 +512,20 @@ export class Data_display {
     }
   }
 
+  /**
+   * Deletes the display by clearing the canvas, input data table, and output data table.
+   */
   public delete_display() {
     this.clearElementById("canvas");
     this.clearElementById("input_data_table");
     this.clearElementById("output_data_table");
   }
 
+  /**
+   * Clears the inner HTML content of an element with the specified ID.
+   * 
+   * @param elementId - The ID of the element to clear.
+   */
   private clearElementById(elementId: string) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -388,7 +534,15 @@ export class Data_display {
   }
 }
 
+/**
+ * Represents input data.
+ */
 export class Input_data {
+  /**
+   * Creates an instance of Input_data.
+   * @param name - The name of the input data.
+   * @param type - The type of the input data.
+   */
   constructor(
     public name: string,
     public type: string,
