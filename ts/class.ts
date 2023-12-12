@@ -75,7 +75,7 @@ export class DecisionTable {
 
   /**
    * Recursively retrieves input data from a DRG element.
-   * 
+   *
    * @param drg_element The DRG element to retrieve input data from.
    * @param res The array to store the retrieved input data.
    * @returns An array of input data.
@@ -96,7 +96,7 @@ export class DecisionTable {
 
   /**
    * Extracts input data from a DMN decision.
-   * 
+   *
    * @param decision - The DMN decision object.
    * @param res - The array to store the extracted input data.
    */
@@ -114,7 +114,7 @@ export class DecisionTable {
 
   /**
    * Extracts input data from the input clause.
-   * 
+   *
    * @param input_clause - The input clause object.
    * @param res - The array to store the extracted input data.
    */
@@ -135,7 +135,7 @@ export class DecisionTable {
 
   /**
    * Defines the input data for the DMN project.
-   * 
+   *
    * @returns A Promise that resolves when the input data is defined.
    */
   private async define_input_data(): Promise<void> {
@@ -150,7 +150,7 @@ export class DecisionTable {
 
   /**
    * Recursively retrieves output data from a DRG element.
-   * 
+   *
    * @param drg_element The DRG element to process.
    * @param res The array to store the output data.
    * @returns An array of output data.
@@ -171,7 +171,7 @@ export class DecisionTable {
 
   /**
    * Extracts output data from a DMN decision.
-   * 
+   *
    * @param decision - The DMN decision to extract output data from.
    * @param res - The input data array.
    */
@@ -189,7 +189,7 @@ export class DecisionTable {
 
   /**
    * Extracts output data from the given output clause and adds it to the provided array.
-   * 
+   *
    * @param output_clause - The output clause to extract data from.
    * @param res - The array to add the extracted data to.
    */
@@ -204,14 +204,17 @@ export class DecisionTable {
 
   /**
    * Defines the output data for the DMN project.
-   * 
+   *
    * @returns A Promise that resolves when the output data is defined.
    */
   private async define_output_data(): Promise<void> {
     if (this.dmn_data && this.dmn_data.me) {
       const output_data = this.recur_get_output_data(this.dmn_data.me);
       this.dmn_output_data = output_data;
-      if (this.dmn_output_data.length === 1 && this.dmn_output_data[0].name === undefined) {
+      if (
+        this.dmn_output_data.length === 1 &&
+        this.dmn_output_data[0].name === undefined
+      ) {
         const swal = require("sweetalert2");
         swal.fire({
           icon: "error",
@@ -252,18 +255,18 @@ export class DecisionTable {
     if (!this.is_init) {
       await this.init();
     }
-  
+
     const rules = this.define_rules();
     const hitPolicy = this.getHitPolicy(); // Supposons que cette méthode existe et récupère la politique de correspondance.
     const results: Record<string, any>[] = [];
-  
+
     rules.forEach((rule: DMN_DecisionRule) => {
       const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
         const inputName = this.dmn_input_data[index].name;
         const expression = inputEntry.text;
         return unaryTest(expression, json[inputName]);
       });
-  
+
       if (ruleMatch) {
         const result: Record<string, any> = {};
         rule.outputEntry.forEach((outputEntry, index) => {
@@ -273,61 +276,66 @@ export class DecisionTable {
         results.push(result);
       }
     });
-  
+
     switch (hitPolicy) {
-      case 'UNIQUE':
+      case "UNIQUE":
         if (results.length === 1) {
           return results[0];
         } else if (results.length > 1) {
-          throw new Error('Hit policy violation: More than one rule matched for UNIQUE hit policy.');
+          throw new Error(
+            "Hit policy violation: More than one rule matched for UNIQUE hit policy.",
+          );
         }
         break;
-      case 'FIRST':
+      case "FIRST":
         if (results.length > 0) {
           return results[0];
         }
         break;
-      case 'ANY':
-        if (results.every(result => JSON.stringify(result) === JSON.stringify(results[0]))) {
+      case "ANY":
+        if (
+          results.every(
+            (result) => JSON.stringify(result) === JSON.stringify(results[0]),
+          )
+        ) {
           return results[0];
         } else {
-          throw new Error('Hit policy violation: Different results for ANY hit policy.');
+          throw new Error(
+            "Hit policy violation: Different results for ANY hit policy.",
+          );
         }
-      case 'COLLECT':
+      case "COLLECT":
         return results;
       // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
       default:
-        throw new Error('Hit policy not recognized or not implemented.');
+        throw new Error("Hit policy not recognized or not implemented.");
     }
-  return {};
+    return {};
   }
-  
-    /**
-     * Retrieves the hit policy of the DMN decision table.
-     * 
-     * @returns The hit policy of the DMN decision table, or an empty string if the DMN data is not initialized.
-     */
-    private getHitPolicy(): string {
-      if (this.dmn_data && this.dmn_data.me) {
-        const decision = is_DMN_Definitions(this.dmn_data.me)
-          ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
-          : [];
-        const decision_table = is_DMN_Decision(decision[0])
-          ? decision[0].decisionLogic
-          : null;
-        const hitPolicy = is_DMN_DecisionTable(decision_table)
-          ? decision_table.hitPolicy
-          : null;
-        return hitPolicy;
-      } else {
-        // Handle the case where dmn_data or dmn_data.me is not available
-        console.error("DMN data is not initialized.");
-        return "";
-      }
+
+  /**
+   * Retrieves the hit policy of the DMN decision table.
+   *
+   * @returns The hit policy of the DMN decision table, or an empty string if the DMN data is not initialized.
+   */
+  private getHitPolicy(): string {
+    if (this.dmn_data && this.dmn_data.me) {
+      const decision = is_DMN_Definitions(this.dmn_data.me)
+        ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
+        : [];
+      const decision_table = is_DMN_Decision(decision[0])
+        ? decision[0].decisionLogic
+        : null;
+        /* TODO: Handle the case where the decision table is not defined. */
+        const hitPolicy: string | null = null;
+      return hitPolicy;
+    } else {
+      // Handle the case where dmn_data or dmn_data.me is not available
+      console.error("DMN data is not initialized.");
+      return "";
     }
+  }
 }
-
-
 
 /**
  * Represents the current run of a process.
@@ -337,12 +345,12 @@ export class Current_run {
    * The decision table associated with the current run.
    */
   public decision_table?: DecisionTable;
-  
+
   /**
    * The input data for the current run.
    */
   public data_input?: any;
-  
+
   /**
    * The data display for the current run.
    */
@@ -427,7 +435,7 @@ export class Data_display {
 
   /**
    * Creates an HTML table element with the specified headers and rows.
-   * 
+   *
    * @param headers - An array of strings representing the table headers.
    * @param rows - An array of arrays of strings representing the table rows.
    * @returns The created HTMLTableElement.
@@ -523,7 +531,7 @@ export class Data_display {
 
   /**
    * Clears the inner HTML content of an element with the specified ID.
-   * 
+   *
    * @param elementId - The ID of the element to clear.
    */
   private clearElementById(elementId: string) {
