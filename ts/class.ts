@@ -30,8 +30,8 @@ declare const DmnModdle: any;
 export class DecisionTable {
   private dmnModdle = new DmnModdle();
   public dmn_data: DMN_data | null = null;
-  public dmn_input_data: Input_data[] = [];
-  public dmn_output_data: Input_data[] = [];
+  public dmn_input_data: InputData[] = [];
+  public dmn_output_data: InputData[] = [];
   public is_init: boolean = false;
 
   constructor(public file: File) {}
@@ -82,8 +82,8 @@ export class DecisionTable {
    */
   private recur_get_input_data(
     drg_element: ExtendedModdleElement,
-    res: Input_data[] = [],
-  ): Input_data[] {
+    res: InputData[] = [],
+  ): InputData[] {
     if (is_ExtendedModdleElement(drg_element) && drg_element.drgElement) {
       drg_element.drgElement.forEach((element: ExtendedModdleElement) => {
         this.recur_get_input_data(element, res);
@@ -102,7 +102,7 @@ export class DecisionTable {
    */
   private extractInputDataFromDecision(
     decision: DMN_Decision,
-    res: Input_data[],
+    res: InputData[],
   ): void {
     const decision_table = decision.decisionLogic;
     if (is_DMN_DecisionTable(decision_table)) {
@@ -120,7 +120,7 @@ export class DecisionTable {
    */
   private extractInputDataFromClause(
     input_clause: any,
-    res: Input_data[],
+    res: InputData[],
   ): void {
     const input_expression = input_clause.inputExpression;
     if (
@@ -129,7 +129,7 @@ export class DecisionTable {
       input_expression.typeRef
     ) {
       const name = input_expression.text.split(" ")[0];
-      res.push(new Input_data(name, input_expression.typeRef));
+      res.push(new InputData(name, input_expression.typeRef));
     }
   }
 
@@ -157,8 +157,8 @@ export class DecisionTable {
    */
   private recur_get_output_data(
     drg_element: ExtendedModdleElement,
-    res: Input_data[] = [],
-  ): Input_data[] {
+    res: InputData[] = [],
+  ): InputData[] {
     if (is_ExtendedModdleElement(drg_element) && drg_element.drgElement) {
       drg_element.drgElement.forEach((element: ExtendedModdleElement) => {
         this.recur_get_output_data(element, res);
@@ -177,7 +177,7 @@ export class DecisionTable {
    */
   private extractOutputDataFromDecision(
     decision: DMN_Decision,
-    res: Input_data[],
+    res: InputData[],
   ): void {
     const decision_table = decision.decisionLogic;
     if (is_DMN_DecisionTable(decision_table)) {
@@ -195,11 +195,11 @@ export class DecisionTable {
    */
   private extractOutputDataFromClause(
     output_clause: any,
-    res: Input_data[],
+    res: InputData[],
   ): void {
     const name = output_clause.name;
     const type = output_clause.typeRef;
-    res.push(new Input_data(name, type));
+    res.push(new InputData(name, type));
   }
 
   /**
@@ -340,7 +340,7 @@ export class DecisionTable {
 /**
  * Represents the current run of a process.
  */
-export class Current_run {
+export class CurrentRun {
   /**
    * The decision table associated with the current run.
    */
@@ -354,10 +354,10 @@ export class Current_run {
   /**
    * The data display for the current run.
    */
-  public data_display?: Data_display;
+  public data_display?: DataDisplay;
 
   /**
-   * Creates a new instance of the Current_run class.
+   * Creates a new instance of the CurrentRun class.
    * @param current_run - Indicates if the current run is active or not.
    */
   constructor(public current_run: boolean = false) {}
@@ -373,7 +373,7 @@ export class Current_run {
 /**
  * Represents a class for displaying data in a decision table.
  */
-export class Data_display {
+export class DataDisplay {
   private decision_table: DecisionTable;
 
   /**
@@ -545,9 +545,9 @@ export class Data_display {
 /**
  * Represents input data.
  */
-export class Input_data {
+export class InputData {
   /**
-   * Creates an instance of Input_data.
+   * Creates an instance of InputData.
    * @param name - The name of the input data.
    * @param type - The type of the input data.
    */
