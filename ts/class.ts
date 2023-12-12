@@ -173,33 +173,77 @@ export class DecisionTable {
     if (!this.is_init) {
       await this.init();
     }
-
-    // Initialize a result object
-    const result: Record<string, any> = {};
-
-    // Validate input data and populate the result object
-    this.dmn_input_data.forEach((input_data) => {
-      const data_name = input_data.name;
-      const data_type = input_data.type;
-      const data_value = json[data_name];
-      if (typeof data_value !== data_type) {
-        // Trigger an error notification with sweetalert2
-        const swal = require("sweetalert2");
-        swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `The data ${data_name} must be of type ${data_type}!`,
+  
+    const rules = this.define_rules();
+    const hitPolicy = this.getHitPolicy(); // Supposons que cette méthode existe et récupère la politique de correspondance.
+    const results: Record<string, any>[] = [];
+  
+    rules.forEach((rule: DMN_DecisionRule) => {
+      const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
+        const inputName = this.dmn_input_data[index].name;
+        const expression = inputEntry.text;
+        return unaryTest(expression, json[inputName]);
+      });
+  
+      if (ruleMatch) {
+        const result: Record<string, any> = {};
+        rule.outputEntry.forEach((outputEntry, index) => {
+          const outputName = this.dmn_output_data[index].name;
+          result[outputName] = outputEntry.text;
         });
-      } else {
-        // Assign the valid data to the result object
-        result[data_name] = data_value;
+        results.push(result);
       }
     });
-
-    // Return the result object wrapped in a Promise
-    return Promise.resolve(result);
+  
+    switch (hitPolicy) {
+      case 'UNIQUE':
+        if (results.length === 1) {
+          return results[0];
+        } else if (results.length > 1) {
+          throw new Error('Hit policy violation: More than one rule matched for UNIQUE hit policy.');
+        }
+        break;
+      case 'FIRST':
+        if (results.length > 0) {
+          return results[0];
+        }
+        break;
+      case 'ANY':
+        if (results.every(result => JSON.stringify(result) === JSON.stringify(results[0]))) {
+          return results[0];
+        } else {
+          throw new Error('Hit policy violation: Different results for ANY hit policy.');
+        }
+      case 'COLLECT':
+        return results;
+      // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
+      default:
+        throw new Error('Hit policy not recognized or not implemented.');
+    }
+  return {};
   }
-}
+  
+    private getHitPolicy(): string {
+      if (this.dmn_data && this.dmn_data.me) {
+        const decision = is_DMN_Definitions(this.dmn_data.me)
+          ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
+          : [];
+        const decision_table = is_DMN_Decision(decision[0])
+          ? decision[0].decisionLogic
+          : null;
+        const hitPolicy = is_DMN_DecisionTable(decision_table)
+          ? decision_table.hitPolicy
+          : null;
+        return hitPolicy;
+      } else {
+        // Handle the case where dmn_data or dmn_data.me is not available
+        console.error("DMN data is not initialized.");
+        return "";
+      }
+    }
+  }
+
+
 
 export class Current_run {
   public decision_table?: DecisionTable;
