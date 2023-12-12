@@ -2,6 +2,6 @@
     "out": "./docs",
     "readme": "none",
     "entryPoints": [
-        "./ts/*.ts"
+        "./ts/**/*.ts"
     ],
   }

@@ -1,5 +1,6 @@
-// Import necessary classes from the class module.
-import { InputData, DataDisplay, DecisionTable, CurrentRun } from "./class";
+import {DecisionTable} from "./models/decision_table";
+import {CurrentRun} from "./models/current_run";
+import { showErrorAlert } from "./utils/alert";
 
 // Declare external libraries without TypeScript definitions.
 declare const DmnJS: any;
@@ -52,25 +53,12 @@ async function handleFiles(files: FileList) {
     } else {
       current_run.delete_display();
     }
-    current_run.data_display = new DataDisplay(file);
-    current_run.decision_table = new DecisionTable(file);
-
-    // Update the UI to prompt for JSON file.
-    const mouth = document.getElementById("mouth");
-    mouth!.innerHTML = "";
-    const p = document.createElement("p");
-    p.innerHTML = "Drag and Drop JSON file file for evalutation";
-    mouth!.appendChild(p);
+    current_run.init(new DecisionTable(file));
   } else if (file.name.endsWith(".json")) {
     // Handle JSON file
     if (current_run.current_run == false) {
       // Trigger an error notification if DMN file is not selected first.
-      const swal = require("sweetalert2");
-      swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "You must select a DMN file first!",
-      });
+      showErrorAlert("Error", "Please select a DMN file first.");
     } else {
       current_run.data_input = file;
 
