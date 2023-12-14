@@ -1,4 +1,4 @@
-import {DecisionTable, test_evaluateDecisionTable} from "./models/decision_table";
+import {DecisionTable, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
@@ -54,7 +54,10 @@ async function handleFiles(files: FileList) {
       current_run.delete_display();
     }
     await current_run.init(new DecisionTable(file));
-    test_evaluateDecisionTable(current_run.decision_table);
+    const json = { customer: 'Business', orderSize: 10 };
+    const rsult = evaluateDecisionTable(current_run.decision_table,json);
+    console.log(rsult);
+    current_run.data_display.display_result(rsult);
     
   } else if (file.name.endsWith(".json")) {
     // Handle JSON file

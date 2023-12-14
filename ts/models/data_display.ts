@@ -98,37 +98,19 @@ export class DataDisplay {
      * @param json - The JSON object containing the data values.
      */
     public display_result(json: any) {
-      // on affiche le résultat dans le tableau :
+      //on utilise createTable pour créer le tableau :
       const table_div = document.getElementById(
         "output_data_table",
       ) as HTMLTableElement;
       if (table_div) {
-        // on crée l'entête du tableau td et th :
-        const table = document.createElement("table");
-  
-        const tr1 = document.createElement("tr");
-        const td1 = document.createElement("td");
-        td1.innerHTML = "Data name";
-        tr1.appendChild(td1);
-        const td2 = document.createElement("td");
-        td2.innerHTML = "Data value";
-        tr1.appendChild(td2);
-        table.appendChild(tr1);
-        // on affiche les données en entrée, leur nom et leur type :
-        for (const data of this.decision_table.dmn_input_data) {
-          const tr1 = document.createElement("tr");
-          const td1 = document.createElement("td");
-          td1.innerHTML = data.name!;
-          tr1.appendChild(td1);
-          const td2 = document.createElement("td");
-          td2.innerHTML = json[data.name!];
-          tr1.appendChild(td2);
-          table.appendChild(tr1);
-        }
+        const table = this.createTable(
+          ["Data name", "Data value"],
+          this.decision_table.dmn_output_data.map((data : Data) => [data.name, json[data.name!]]),
+        );
         table_div.appendChild(table);
         table_div.style.display = "block";
-        //on met la propriete display à block pour afficher le tableau :
       }
+
     }
   
     /**

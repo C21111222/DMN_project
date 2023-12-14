@@ -259,14 +259,6 @@ export class DecisionTable {
   
   }
 
-export function test_evaluateDecisionTable(decision_table : DecisionTable): Record<string, any> {
-  // on genere un json de test, avec un champ 'age' qui vaut 18
-  const json = { customer: 'Business', orderSize: 10 };
-  // on appelle la fonction evaluateDecisionTable
-  const result = evaluateDecisionTable(decision_table, json);
-  console.log(result);
-  return result;
-}
 
 
 export function evaluateDecisionTable(decision_table : DecisionTable, json: any): Record<string, any> {
@@ -292,9 +284,11 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
     }
   });
 
+
   switch (decision_table.hitPolicy) {
     case "UNIQUE":
       if (results.length === 1) {
+        console.log(results[0]);
         return results[0];
       } else if (results.length > 1) {
         throw new Error(
