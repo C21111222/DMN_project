@@ -1,4 +1,4 @@
-import {DecisionTable} from "./models/decision_table";
+import {DecisionTable, test_evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
@@ -53,38 +53,16 @@ async function handleFiles(files: FileList) {
     } else {
       current_run.delete_display();
     }
-    current_run.init(new DecisionTable(file));
+    await current_run.init(new DecisionTable(file));
+    test_evaluateDecisionTable(current_run.decision_table);
+    
   } else if (file.name.endsWith(".json")) {
     // Handle JSON file
     if (current_run.current_run == false) {
       // Trigger an error notification if DMN file is not selected first.
       showErrorAlert("Error", "Please select a DMN file first.");
     } else {
-      current_run.data_input = file;
-
-      // Read and process the JSON file.
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const fileContent = event.target!.result as string;
-        try {
-          const jsonData = JSON.parse(fileContent);
-          if (
-            typeof jsonData === "object" &&
-            jsonData !== null &&
-            !Array.isArray(jsonData)
-          ) {
-            // Evaluate the decision table with the JSON data.
-            const res = current_run.decision_table.eval(jsonData);
-            // Display the result.
-            current_run.data_display.display_result(res);
-          } else {
-            throw new Error("JSON data is not an object.");
-          }
-        } catch (error) {
-          console.error("Failed to parse JSON or invalid data format:", error);
-        }
+        console.error("Failed to parse JSON or invalid data format:");
       };
-      reader.readAsText(file);
     }
   }
-}

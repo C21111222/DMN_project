@@ -12,7 +12,7 @@ import {
     is_DMN_InputData,
     is_DMN_DecisionTable,
 } from "../utils/DMN-JS";
-import { unaryTest } from "feelin";
+import { unaryTest, evaluate } from "feelin";
 import { Data } from "./data";
 import  { showErrorAlert } from "../utils/alert";
 declare const DmnModdle: any;
@@ -33,6 +33,8 @@ export class DecisionTable {
     public dmn_data: DMN_data | null = null;
     public dmn_input_data: Data[] = [];
     public dmn_output_data: Data[] = [];
+    public hitPolicy: string = "UNIQUE";
+    public rules: DMN_DecisionRule[] = [];
     public is_init: boolean = false;
   
     constructor(public file: File) {}
@@ -45,8 +47,10 @@ export class DecisionTable {
      */
     public async init() {
       await this.define_dmn_data();
-      await this.define_input_data();
-      await this.define_output_data();
+      this.define_input_data();
+      this.define_output_data();
+      this.define_rules();
+      this.define_hitPolicy();
       this.is_init = true;
       console.log(this.define_rules());
     }
@@ -55,7 +59,7 @@ export class DecisionTable {
      * Defines the DMN data by parsing the XML content of the file.
      * @returns {Promise<void>} A promise that resolves when the DMN data is defined.
      */
-    private async define_dmn_data() {
+    private async define_dmn_data(): Promise<void> {
       const xml = await this.file.text();
       const file_name = this.file.name;
       const dmn_file: DMN_file = { file_name, file_content: xml };
@@ -134,7 +138,7 @@ export class DecisionTable {
      *
      * @returns A Promise that resolves when the input data is defined.
      */
-    private async define_input_data(): Promise<void> {
+    private define_input_data(): void {
       if (this.dmn_data && this.dmn_data.me) {
         const input_data = this.recur_get_input_data(this.dmn_data.me);
         this.dmn_input_data = input_data;
@@ -200,10 +204,8 @@ export class DecisionTable {
   
     /**
      * Defines the output data for the DMN project.
-     *
-     * @returns A Promise that resolves when the output data is defined.
      */
-    private async define_output_data(): Promise<void> {
+    private define_output_data(): void {
       if (this.dmn_data && this.dmn_data.me) {
         const output_data = this.recur_get_output_data(this.dmn_data.me);
         this.dmn_output_data = output_data;
@@ -233,96 +235,95 @@ export class DecisionTable {
       const rules = is_DMN_DecisionTable(decision_table)
         ? decision_table.rule
         : [];
-      return rules;
+      this.rules = rules;
     }
-  
-    /**
-     * Evaluates the given JSON data against the defined rules and returns the result based on the hit policy.
-     * @param json The JSON data to be evaluated.
-     * @returns A promise that resolves to the result of the evaluation.
-     * @throws {Error} If the hit policy is violated or not recognized.
-     */
-    public async eval(json: any): Promise<Record<string, any>> {
-      if (!this.is_init) {
-        await this.init();
-      }
-  
-      const rules = this.define_rules();
-      const hitPolicy = this.getHitPolicy(); // Supposons que cette méthode existe et récupère la politique de correspondance.
-      const results: Record<string, any>[] = [];
-  
-      rules.forEach((rule: DMN_DecisionRule) => {
-        const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
-          const inputName = this.dmn_input_data[index].name;
-          const expression = inputEntry.text;
-          return unaryTest(expression, json[inputName]);
-        });
-  
-        if (ruleMatch) {
-          const result: Record<string, any> = {};
-          rule.outputEntry.forEach((outputEntry, index) => {
-            const outputName = this.dmn_output_data[index].name;
-            result[outputName] = outputEntry.text;
-          });
-          results.push(result);
-        }
-      });
-  
-      switch (hitPolicy) {
-        case "UNIQUE":
-          if (results.length === 1) {
-            return results[0];
-          } else if (results.length > 1) {
-            throw new Error(
-              "Hit policy violation: More than one rule matched for UNIQUE hit policy.",
-            );
-          }
-          break;
-        case "FIRST":
-          if (results.length > 0) {
-            return results[0];
-          }
-          break;
-        case "ANY":
-          if (
-            results.every(
-              (result) => JSON.stringify(result) === JSON.stringify(results[0]),
-            )
-          ) {
-            return results[0];
-          } else {
-            throw new Error(
-              "Hit policy violation: Different results for ANY hit policy.",
-            );
-          }
-        case "COLLECT":
-          return results;
-        // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
-        default:
-          throw new Error("Hit policy not recognized or not implemented.");
-      }
-      return {};
+
+  /**
+   * Defines the hit policy for the DMN project.
+   */
+  private define_hitPolicy(): void {
+    if (this.dmn_data && this.dmn_data.me) {
+      const decision = is_DMN_Definitions(this.dmn_data.me)
+        ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
+        : [];
+      const decision_table = is_DMN_Decision(decision[0])
+        ? decision[0].decisionLogic
+        : null;
+      this.hitPolicy = is_DMN_DecisionTable(decision_table) && decision_table.hitPolicy
+        ? decision_table.hitPolicy
+        : "UNIQUE";
+    } else {
+      this.hitPolicy = "UNIQUE";
     }
-  
-    /**
-     * Retrieves the hit policy of the DMN decision table.
-     *
-     * @returns The hit policy of the DMN decision table, or an empty string if the DMN data is not initialized.
-     */
-    private getHitPolicy(): string {
-      if (this.dmn_data && this.dmn_data.me) {
-        const decision = is_DMN_Definitions(this.dmn_data.me)
-          ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
-          : [];
-        const decision_table = is_DMN_Decision(decision[0])
-          ? decision[0].decisionLogic
-          : null;
-        return is_DMN_DecisionTable(decision_table) && decision_table.hitPolicy
-          ? decision_table.hitPolicy
-          : "UNIQUE";
-      } else {
-        return "UNIQUE";
-      }
-    }
+  }
   
   }
+
+export function test_evaluateDecisionTable(decision_table : DecisionTable): Record<string, any> {
+  // on genere un json de test, avec un champ 'age' qui vaut 18
+  const json = { customer: 'Business', orderSize: 10 };
+  // on appelle la fonction evaluateDecisionTable
+  const result = evaluateDecisionTable(decision_table, json);
+  console.log(result);
+  return result;
+}
+
+
+export function evaluateDecisionTable(decision_table : DecisionTable, json: any): Record<string, any> {
+  if (!decision_table.is_init) {
+    throw new Error("Decision table is not initialized.");
+  }
+  const results: Record<string, any>[] = [];
+  decision_table.rules.forEach((rule: DMN_DecisionRule) => {
+    const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
+      const inputName = decision_table.dmn_input_data[index].name;
+      const expression = inputEntry.text;
+      return unaryTest(expression, {'?':json[inputName]});
+    });
+
+    if (ruleMatch) {
+      console.log("rule match");
+      const result: Record<string, any> = {};
+      rule.outputEntry.forEach((outputEntry, index) => {
+        const outputName = decision_table.dmn_output_data[index].name;
+        result[outputName] = outputEntry.text;
+      });
+      results.push(result);
+    }
+  });
+
+  switch (decision_table.hitPolicy) {
+    case "UNIQUE":
+      if (results.length === 1) {
+        return results[0];
+      } else if (results.length > 1) {
+        throw new Error(
+          "Hit policy violation: More than one rule matched for UNIQUE hit policy.",
+        );
+      }
+      break;
+    case "FIRST":
+      if (results.length > 0) {
+        return results[0];
+      }
+      break;
+    case "ANY":
+      if (
+        results.every(
+          (result) => JSON.stringify(result) === JSON.stringify(results[0]),
+        )
+      ) {
+        return results[0];
+      } else {
+        throw new Error(
+          "Hit policy violation: Different results for ANY hit policy.",
+        );
+      }
+    case "COLLECT":
+      return results;
+    // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
+    default:
+      throw new Error("Hit policy not recognized or not implemented.");
+  }
+  return {};
+}
