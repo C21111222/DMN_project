@@ -4,6 +4,7 @@
 
 This project provides a web-based interface for viewing and evaluating DMN (Decision Model and Notation) files. Users can drag and drop a DMN file onto the interface to view the decision table and input data. The tool also allows for the evaluation of decision logic against provided inputs.
 
+![Interface](images/style.png)
 ### Features
 
 - Drag and Drop DMN file upload
