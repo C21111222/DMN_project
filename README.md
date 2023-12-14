@@ -29,6 +29,14 @@ To use the tool:
 3. View the decision table and input data.
 4. Evaluate decision logic by providing inputs and observing the results.
 
+To generate documentation:
+
+1. Navigate to the project directory.
+2. Run `npm run doc`.
+3. Open `docs/index.html` in a modern web browser.
+
+
+
 ### Acknowledgments
 
 - Created by [C21111222](https://github.com/C21111222)
