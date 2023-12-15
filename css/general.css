@@ -51,7 +51,7 @@ div#input_data_form_text {
     box-shadow: 5px 5px 8px rgb(133, 133, 133);
     position: absolute;
     top: 0;
-    left: 31%;
+    left: 35%;
 }
 
 div#moove {
@@ -64,14 +64,14 @@ div#moove {
 div#inputDataModal {
     display: none;
 
-    width: 450px; /* Full width */
-    height: 250px; /* Full height */
+    width: 490px; /* Full width */
+    height: 500px; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(240, 240, 240);
     /* centre la fenêtre modale */
     position: fixed;
-    top: 11%;
-    left: 62%;
+    top: 21%;
+    left: 42%;
     border-radius: 25px;
     border: 3px solid var(--speech_border);
     box-shadow: 5px 5px 8px rgb(133, 133, 133);
@@ -86,12 +86,22 @@ div#close {
     cursor: pointer;
 }
 
+table#input_data_table_form {
+    width: 100%;
+    font-family: 'Cambria';
+    font-size: 18px;
+}
 div#submit {
     position: absolute;
     top: 80%;
-    right: 40%;
+    right: 43%;
     padding: 10px;
     cursor: pointer;
+    /* font-family: (pas cambria); */
+    font-family: 'Arial';
+
+    
+    font-size: 30px;
 }
 
 button#openFormBtn {
