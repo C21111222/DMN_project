@@ -68,10 +68,10 @@ async function handleFiles(files: FileList) {
     if (current_run.current_run == false) {
       current_run.current_run = true;
     } else {
-      closeForm();
       current_run.delete_display();
     }
     await current_run.init(new DecisionTable(file));
+    updateForm();
     
   } else if (file.name.endsWith(".json")) {
     // Handle JSON file
@@ -105,16 +105,20 @@ function openForm() {
     showErrorAlert("Error", "Please select a DMN file first.");
   } else {
     const table = document.getElementById("input_data_table_form") as HTMLTableElement;
-    table!.innerHTML = "";
-    // on ajoute les lignes, sur chaque ligne on fait une colonne pour le nom et une un input pour la valeur
-    for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
-      const row = table!.insertRow();
-      const cell1 = row.insertCell();
-      const cell2 = row.insertCell();
-      cell1.innerHTML = current_run.decision_table.dmn_input_data[i].name + " : ";
-      cell2.innerHTML = `<input type="text" id="${current_run.decision_table.dmn_input_data[i].name}" name="${current_run.decision_table.dmn_input_data[i].name}" value="">`;
-    }
     document.getElementById("inputDataModal")!.style.display = "block";
+  }
+}
+
+function updateForm() {
+  const table = document.getElementById("input_data_table_form") as HTMLTableElement;
+  table!.innerHTML = "";
+  // on ajoute les lignes, sur chaque ligne on fait une colonne pour le nom et une un input pour la valeur
+  for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
+    const row = table!.insertRow();
+    const cell1 = row.insertCell();
+    const cell2 = row.insertCell();
+    cell1.innerHTML = current_run.decision_table.dmn_input_data[i].name + " : ";
+    cell2.innerHTML = `<input type="text" id="${current_run.decision_table.dmn_input_data[i].name}" name="${current_run.decision_table.dmn_input_data[i].name}" value="">`;
   }
 }
 
@@ -127,7 +131,6 @@ function submitForm() {
   const rsult = evaluateDecisionTable(current_run.decision_table, json);
   current_run.data_display.delete_result();
   current_run.data_display.display_result(rsult);
-  closeForm();
 }
 
 function closeForm() {
