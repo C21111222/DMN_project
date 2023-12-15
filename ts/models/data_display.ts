@@ -108,9 +108,19 @@ export class DataDisplay {
           this.decision_table.dmn_output_data.map((data : Data) => [data.name, json[data.name!]]),
         );
         table_div.appendChild(table);
-        table_div.style.display = "block";
+        this.show_result();
+        
       }
 
+    }
+
+    public show_result() {
+      const table_div = document.getElementById(
+        "output_data_div",
+      ) as HTMLTableElement;
+      if (table_div) {
+        table_div.style.display = "block";
+      }
     }
 
     public hide_result() {

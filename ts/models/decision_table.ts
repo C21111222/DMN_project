@@ -315,7 +315,6 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
         );
       }
     case "COLLECT":
-      console.log(results);
       // si on a plusieurs résultats, on les concatène
       if (results.length > 1) {
         const result: Record<string, any> = {};

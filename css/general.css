@@ -163,7 +163,7 @@ div#input_data_div {
     float: left;
 }
 
-div#output_data_table {
+div#output_data_div {
     width: 30%;
     min-height: 20vh; /* Hauteur minimale pour s'assurer que la div n'est pas trop petite */
     background-color: rgb(180, 170, 170);
@@ -178,6 +178,22 @@ div#output_data_table {
     position: relative;
     float: right;
     display: none;
+}
+
+div#result_libelle{
+    /* placé en haut à gauche de la div parent (input_data_table) */
+    justify-content: flex-start;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 25px;
+    background-color: rgba(240, 240, 240, 0.692);
+    box-shadow: 5px 5px 8px rgb(133, 133, 133);
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 div.table_text {
     /* placé en haut à gauche de la div parent (input_data_table) */
