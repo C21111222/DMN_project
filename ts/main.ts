@@ -1,3 +1,9 @@
+/**
+ * Imports necessary modules and initializes the application.
+ * Handles file drop, file selection, form submission, and form display.
+ * Provides functions for handling DMN and JSON files, updating the form, and displaying results.
+ * Supports dragging and moving the modal window.
+ */
 import {DecisionTable, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
@@ -19,16 +25,11 @@ closeBtn.addEventListener("click", closeForm);
 const submitBtn = document.getElementById("submit")!;
 submitBtn.addEventListener("click", submitForm);
 
-
 const modal = document.getElementById('inputDataModal');
 const header = document.getElementById('moove');
 
-
-
-
 // Initialize the current run state.
 const current_run = new CurrentRun(false);
-
 
 // Add dragover event listener to provide visual feedback.
 dropArea.addEventListener("dragover", (e) => {
@@ -96,9 +97,13 @@ async function handleFiles(files: FileList) {
 
     }
   }
-  }
+}
 
-
+/**
+ * Opens the form.
+ * If the current run is false, triggers an error notification if DMN file is not selected first.
+ * Otherwise, displays the input data table form.
+ */
 function openForm() {
   if (current_run.current_run == false) {
     // Trigger an error notification if DMN file is not selected first.
@@ -109,6 +114,9 @@ function openForm() {
   }
 }
 
+/**
+ * Updates the form with input data from the current run's decision table.
+ */
 function updateForm() {
   const table = document.getElementById("input_data_table_form") as HTMLTableElement;
   table!.innerHTML = "";
@@ -122,6 +130,9 @@ function updateForm() {
   }
 }
 
+/**
+ * Submits the form and performs the necessary actions based on the input data.
+ */
 function submitForm() {
   const json: Record<string, any> = {};
   for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
@@ -133,9 +144,13 @@ function submitForm() {
   current_run.data_display.display_result(rsult);
 }
 
+/**
+ * Closes the form by hiding the 'inputDataModal' element.
+ */
 function closeForm() {
   document.getElementById('inputDataModal').style.display = 'none';
 }
+
 
 let isDragging = false;
 let offsetX = 0;
