@@ -18,7 +18,7 @@ import  { showErrorAlert } from "../utils/alert";
 declare const DmnModdle: any;
 
 /**
- * Represents a DMN file.
+ * Represents a DMN file, based on the DMN-JS moddle.
  * 
  * @property dmn_data - The DMN data.
  * @property dmn_input_data - The input data.
@@ -260,6 +260,13 @@ export class DecisionTable {
 
 
 
+/**
+ * Evaluates a decision table based on the provided JSON input.
+ * @param decision_table - The decision table to evaluate.
+ * @param json - The JSON input data.
+ * @returns The result of the evaluation.
+ * @throws Error if the decision table is not initialized or if there is a hit policy violation.
+ */
 export function evaluateDecisionTable(decision_table : DecisionTable, json: any): Record<string, any> {
   if (!decision_table.is_init) {
     throw new Error("Decision table is not initialized.");
@@ -315,7 +322,6 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
         );
       }
     case "COLLECT":
-      // si on a plusieurs résultats, on les concatène
       if (results.length > 1) {
         const result: Record<string, any> = {};
         results.forEach((res) => {
@@ -331,7 +337,6 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
         return results[0];
       }
       return results;
-    // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
     default:
       throw new Error("Hit policy not recognized or not implemented.");
   }
