@@ -12,9 +12,9 @@ import {
     is_DMN_InputData,
     is_DMN_DecisionTable,
 } from "../utils/DMN-JS";
-import { unaryTest, evaluate } from "feelin";
+import { unaryTest } from "feelin";
 import { Data } from "./data";
-import  { showErrorAlert } from "../utils/alert";
+import  { showErrorAlert, showWarningAlert } from "../utils/alert";
 declare const DmnModdle: any;
 
 /**
@@ -212,7 +212,7 @@ export class DecisionTable {
           this.dmn_output_data.length === 1 &&
           this.dmn_output_data[0].name === undefined
         ) {
-          showErrorAlert("Error parsing DMN file", "No output data found.");
+          showWarningAlert("Error parsing DMN file", "No output data found.");
         }
       } else {
         // Handle the case where dmn_data or dmn_data.me is not available

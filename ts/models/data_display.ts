@@ -1,4 +1,5 @@
 import { DecisionTable } from "./decision_table";
+import { showWarningAlert, showErrorAlert } from "../utils/alert";
 import {Data} from "./data";
 declare const DmnJS: any;
 
@@ -37,11 +38,11 @@ export class DataDisplay {
       try {
         const { warnings } = await viewer.importXML(xml);
         if (warnings.length) {
-          console.warn("DMN Viewer Warnings:", warnings);
+          showWarningAlert("DMN Viewer Warnings", warnings.join("\n"));
         }
-        console.log("DMN Viewer Rendered");
       } catch (err) {
-        console.error("DMN Viewer Error Rendering:", err);
+        showErrorAlert("Error displaying table", err.message);
+
       }
     }
   
@@ -51,7 +52,7 @@ export class DataDisplay {
     private display_input_data() {
       const table_div = document.getElementById("input_data_table");
       if (!table_div) {
-        console.error("Input data table element not found.");
+        showErrorAlert("Error displaying input data", "Could not find input data table div");
         return;
       }
   
