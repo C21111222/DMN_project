@@ -315,6 +315,22 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
         );
       }
     case "COLLECT":
+      console.log(results);
+      // si on a plusieurs résultats, on les concatène
+      if (results.length > 1) {
+        const result: Record<string, any> = {};
+        results.forEach((res) => {
+          Object.keys(res).forEach((key) => {
+            if (result[key] === undefined) {
+              result[key] = [];
+            }
+            result[key].push(res[key]);
+          });
+        });
+        return result;
+      } else if (results.length === 1) {
+        return results[0];
+      }
       return results;
     // Ajoutez des cas supplémentaires pour d'autres politiques de correspondance si nécessaire.
     default:
