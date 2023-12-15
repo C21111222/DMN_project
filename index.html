@@ -9,7 +9,7 @@
 
    
 </head>
-<body>
+<body class="noselect">
     <div id="screen">
         <div id="top_bar">
             <div id="top_bar_text">
@@ -31,17 +31,25 @@
                     <p>Drag and Drop DMN file Here</p>
                 </div>
             </div>
-            <div id="input_data_table">
+            <div id="button">
+                <button id="openFormBtn">Open Input Data Form</button>
+            </div>
+            <div id="input_data_div">
                 <div class="table_text">
                     <p>Input Data</p>
+                    <div id="input_data_table">
+
+                    </div>
                 </div>
                 
             </div>
-            <div id="output_data_table">
+            <div id="output_data_div">
                 <div class="table_text">
                     <p>Result</p>
                 </div>
-                
+                <div id="output_data_table">
+
+                </div>
             </div>
     </div>
     </div>
@@ -52,6 +60,27 @@
             </div>
         </div>
         <div id="canvas">
+        </div>
+    </div>
+    <div id="inputDataModal" class="modal">
+        <div class="modal-content">
+            <div id="moove">
+                <div id="input_data_form_text" >
+                    <p>Input Data Form</p>
+                </div>
+            </div>
+            <div id="input_data_form">
+                <div id="input_data_form_table">
+                    <table id="input_data_table_form">
+                    </table>
+                </div>
+                <div id="close">
+                    <button id="closeFormBtn">Cancel</button>
+                </div>
+                <div id="submit">
+                    <button id="submitFormBtn">Submit</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="./node_modules/dmn-js/dist/dmn-viewer.development.js"></script>  

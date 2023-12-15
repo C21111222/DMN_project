@@ -112,6 +112,19 @@ export class DataDisplay {
       }
 
     }
+
+    public hide_result() {
+      const table_div = document.getElementById(
+        "output_data_div",
+      ) as HTMLTableElement;
+      if (table_div) {
+        table_div.style.display = "none";
+      }
+    }
+
+    public delete_result() {
+      this.clearElementById("output_data_table");
+    }
   
     /**
      * Deletes the display by clearing the canvas, input data table, and output data table.
@@ -120,6 +133,7 @@ export class DataDisplay {
       this.clearElementById("canvas");
       this.clearElementById("input_data_table");
       this.clearElementById("output_data_table");
+      this.hide_result();
     }
   
     /**

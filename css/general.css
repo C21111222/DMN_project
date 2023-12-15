@@ -22,6 +22,90 @@ div#screen {
 
 }
 
+.noselect {
+-webkit-user-select: none; /* Safari */
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* Internet Explorer/Edge */
+user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Edge */
+}
+
+div#input_data_form_table {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* on le centre au centre verticalement */
+    position: absolute;
+    top: 20%;
+    left: 15%;
+}
+div#input_data_form_text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 25px;
+    background-color: rgba(240, 240, 240, 0.692);
+    box-shadow: 5px 5px 8px rgb(133, 133, 133);
+    position: absolute;
+    top: 0;
+    left: 31%;
+}
+
+div#moove {
+    cursor: move; 
+    border-radius: 25px;
+    width: 100%;
+    height: 3%;
+}
+
+div#inputDataModal {
+    display: none;
+
+    width: 450px; /* Full width */
+    height: 250px; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(240, 240, 240);
+    /* centre la fenêtre modale */
+    position: fixed;
+    top: 11%;
+    left: 62%;
+    border-radius: 25px;
+    border: 3px solid var(--speech_border);
+    box-shadow: 5px 5px 8px rgb(133, 133, 133);
+
+}
+
+div#close {
+    position: absolute;
+    top: 80%;
+    right: 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+div#submit {
+    position: absolute;
+    top: 80%;
+    right: 40%;
+    padding: 10px;
+    cursor: pointer;
+}
+
+button#openFormBtn {
+    display: block;
+    margin: 20px auto; /* Adjust the margin as needed */
+    padding: 10px 20px; /* Adjust the padding as needed */
+    position: absolute;
+    top: 44%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    border: 3px solid var(--speech_border);
+    left: 128px;
+    
+}
 /* tableau de données avec les lignes de couleur noire entre chaque ligne */
 table.data {
 
@@ -43,8 +127,17 @@ table.data td {
     padding: 8px; /* Ajout d'un espace intérieur aux cellules */
 }
 
-
 div#input_data_table {
+    /* placé  au centre horizontalement */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 20%;
+    left: 205%;
+}
+div#input_data_div {
     width: 30%;
     min-height: 20vh; /* Hauteur minimale pour s'assurer que la div n'est pas trop petite */
     background-color: rgb(180, 170, 170);

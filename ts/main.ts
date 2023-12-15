@@ -10,8 +10,25 @@ declare const DmnModdle: any;
 const dropArea = document.getElementById("mouth")!;
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 
+const btn = document.getElementById("openFormBtn")!;
+btn.addEventListener("click", openForm);
+
+const closeBtn = document.getElementById("closeFormBtn")!;
+closeBtn.addEventListener("click", closeForm);
+
+const submitBtn = document.getElementById("submit")!;
+submitBtn.addEventListener("click", submitForm);
+
+
+const modal = document.getElementById('inputDataModal');
+const header = document.getElementById('moove');
+
+
+
+
 // Initialize the current run state.
 const current_run = new CurrentRun(false);
+
 
 // Add dragover event listener to provide visual feedback.
 dropArea.addEventListener("dragover", (e) => {
@@ -51,13 +68,10 @@ async function handleFiles(files: FileList) {
     if (current_run.current_run == false) {
       current_run.current_run = true;
     } else {
+      closeForm();
       current_run.delete_display();
     }
     await current_run.init(new DecisionTable(file));
-    const json = { customer: 'Business', orderSize: 10 };
-    const rsult = evaluateDecisionTable(current_run.decision_table,json);
-    console.log(rsult);
-    current_run.data_display.display_result(rsult);
     
   } else if (file.name.endsWith(".json")) {
     // Handle JSON file
@@ -65,7 +79,79 @@ async function handleFiles(files: FileList) {
       // Trigger an error notification if DMN file is not selected first.
       showErrorAlert("Error", "Please select a DMN file first.");
     } else {
-        console.error("Failed to parse JSON or invalid data format:");
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = () => {
+        try {
+          const json = JSON.parse(reader.result as string);
+          const rsult = evaluateDecisionTable(current_run.decision_table, json);
+          current_run.data_display.delete_result();
+          current_run.data_display.hide_result();
+          current_run.data_display.display_result(rsult);
+        } catch (e) {
+          console.error("Failed to parse JSON or invalid data format:");
+          console.error(e);
+        }
       };
+
     }
   }
+  }
+
+
+function openForm() {
+  if (current_run.current_run == false) {
+    // Trigger an error notification if DMN file is not selected first.
+    showErrorAlert("Error", "Please select a DMN file first.");
+  } else {
+    const table = document.getElementById("input_data_table_form") as HTMLTableElement;
+    table!.innerHTML = "";
+    // on ajoute les lignes, sur chaque ligne on fait une colonne pour le nom et une un input pour la valeur
+    for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
+      const row = table!.insertRow();
+      const cell1 = row.insertCell();
+      const cell2 = row.insertCell();
+      cell1.innerHTML = current_run.decision_table.dmn_input_data[i].name + " : ";
+      cell2.innerHTML = `<input type="text" id="${current_run.decision_table.dmn_input_data[i].name}" name="${current_run.decision_table.dmn_input_data[i].name}" value="">`;
+    }
+    document.getElementById("inputDataModal")!.style.display = "block";
+  }
+}
+
+function submitForm() {
+  const json: Record<string, any> = {};
+  for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
+    const input = document.getElementById(current_run.decision_table.dmn_input_data[i].name) as HTMLInputElement;
+    json[current_run.decision_table.dmn_input_data[i].name] = input.value;
+  }
+  const rsult = evaluateDecisionTable(current_run.decision_table, json);
+  current_run.data_display.delete_result();
+  current_run.data_display.display_result(rsult);
+  closeForm();
+}
+
+function closeForm() {
+  document.getElementById('inputDataModal').style.display = 'none';
+}
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+header.addEventListener('mousedown', (e: MouseEvent) => {
+  isDragging = true;
+  offsetX = e.clientX - modal.getBoundingClientRect().left;
+  offsetY = e.clientY - modal.getBoundingClientRect().top;
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e: MouseEvent) => {
+  if (isDragging) {
+    modal.style.left = `${e.clientX - offsetX}px`;
+    modal.style.top = `${e.clientY - offsetY}px`;
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+});

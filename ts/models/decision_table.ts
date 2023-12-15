@@ -52,7 +52,6 @@ export class DecisionTable {
       this.define_rules();
       this.define_hitPolicy();
       this.is_init = true;
-      console.log(this.define_rules());
     }
   
     /**
@@ -270,11 +269,13 @@ export function evaluateDecisionTable(decision_table : DecisionTable, json: any)
     const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
       const inputName = decision_table.dmn_input_data[index].name;
       const expression = inputEntry.text;
+      if (expression == "") {
+        return true;
+      }
       return unaryTest(expression, {'?':json[inputName]});
     });
 
     if (ruleMatch) {
-      console.log("rule match");
       const result: Record<string, any> = {};
       rule.outputEntry.forEach((outputEntry, index) => {
         const outputName = decision_table.dmn_output_data[index].name;
