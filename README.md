@@ -19,6 +19,7 @@ To set up the project locally, follow these steps:
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
 3. Install the necessary dependencies using `npm install`.
+4. Build the project using `npm run build`.
 
 ### Usage
 
