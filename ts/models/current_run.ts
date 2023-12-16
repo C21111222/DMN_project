@@ -37,8 +37,8 @@ export class CurrentRun {
  */
   public async init(decision_table: DecisionTable) {
       this.decision_table = decision_table;
-      this.data_display = new DataDisplay(decision_table);
       await this.decision_table.init();
+      this.data_display = new DataDisplay(decision_table);
     }
 
   /**

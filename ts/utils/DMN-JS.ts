@@ -20,6 +20,11 @@ export function Set_current_diagram(diagram: DMN_file, data?: DMN_data) {
   );
 }
 
+
+export function isModdleElement(value: unknown): value is ModdleElement {
+  return (value as ModdleElement).$type !== undefined;
+}
+
 export interface ModdleElement {
   // Racine du graphe d'héritage de 'dmn-moddle'
   // $attrs: Object; // Unused...

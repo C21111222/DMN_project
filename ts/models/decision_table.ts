@@ -15,6 +15,7 @@ import {
 import { unaryTest } from "feelin";
 import { Data } from "./data";
 import  { showErrorAlert, showWarningAlert } from "../utils/alert";
+import { migrateDiagram } from "../utils/migrate_DMN";
 declare const DmnModdle: any;
 
 /**
@@ -46,6 +47,7 @@ export class DecisionTable {
      * @returns {Promise<void>} A promise that resolves when initialization is complete.
      */
     public async init() {
+      await this.manage_dmn_version();
       await this.define_dmn_data();
       this.define_input_data();
       this.define_output_data();
@@ -53,7 +55,19 @@ export class DecisionTable {
       this.define_hitPolicy();
       this.is_init = true;
     }
-  
+
+  /**
+   * Defines the version of the DMN file and modifies it for compatibility to 1.3.0.
+   */
+  private async manage_dmn_version(): Promise<void> {
+    const xml = await this.file.text();
+    console.log("migrating")
+    const migrated_xml = await migrateDiagram(xml) as string;
+    console.log("migrated")
+    this.file = new File([migrated_xml], this.file.name, { type: "text/xml" });
+  }
+
+
     /**
      * Defines the DMN data by parsing the XML content of the file.
      * @returns {Promise<void>} A promise that resolves when the DMN data is defined.

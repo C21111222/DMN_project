@@ -1,4 +1,4 @@
-# README.md
+# DMN Project
 
 ## DMN Viewer and Evaluation Tool
 

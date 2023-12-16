@@ -116,6 +116,20 @@ button#openFormBtn {
     left: 128px;
     
 }
+
+button#openCsvArea {
+    display: block;
+    margin: 20px auto; /* Adjust the margin as needed */
+    padding: 10px 20px; /* Adjust the padding as needed */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    border: 3px solid var(--speech_border);
+    left: 108px;
+    
+}
+
 /* tableau de données avec les lignes de couleur noire entre chaque ligne */
 table.data {
 

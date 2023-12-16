@@ -7,9 +7,12 @@
     "outDir": "js",
     "sourceMap": true,
     "target": "ES2017",
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./@types"],
     "esModuleInterop": true
   },
   "include": [
     "ts/**/*"
-  ]
+, "index.d.ts"  ]
+  
 }

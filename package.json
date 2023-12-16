@@ -32,11 +32,15 @@
   },
   "homepage": "https://github.com/C21111222/DMN_project#readme",
   "dependencies": {
+    "@bpmn-io/dmn-migrate": "github:bpmn-io/dmn-migrate#main",
     "cacheable-request": "^10.2.14",
     "dmn-engine": "^1.0.6",
     "dmn-js": "^14.6.0",
     "fast-xml-parser": "^4.3.2",
     "feelin": "^1.2.0",
-    "sweetalert2": "^11.10.1"
+    "ids": "^1.0.5",
+    "json-loader": "^0.5.7",
+    "sweetalert2": "^11.10.1",
+    "xmldom": "^0.6.0"
   }
 }
