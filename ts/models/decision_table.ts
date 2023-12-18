@@ -3,6 +3,7 @@ import {
     ExtendedModdleElement,
     is_DMN_LiteralExpression,
     is_ExtendedModdleElement,
+    DMN_DMNElementReference,
     DMN_Decision,
     DMN_data,
     DMN_file,
@@ -28,14 +29,14 @@ declare const DmnModdle: any;
 * @property file - The file object.
   
  */
-export class DecisionTable {
+export class DMNModel {
     private dmnModdle = new DmnModdle();
     public dmn_data: DMN_data | null = null;
     public dmn_input_data: Data[] = [];
     public dmn_output_data: Data[] = [];
-    public hitPolicy: string = "UNIQUE";
-    public rules: DMN_DecisionRule[] = [];
     public is_init: boolean = false;
+    public dmn_decision: DMN_Decision[] = [];
+    public dmn_input_decision: DMN_Decision[] = [];
   
     constructor(public file: File) {}
   
@@ -48,10 +49,9 @@ export class DecisionTable {
     public async init() {
       await this.manage_dmn_version();
       await this.define_dmn_data();
+      await this.define_dmn_decision();
       this.define_input_data();
       this.define_output_data();
-      this.define_rules();
-      this.define_hitPolicy();
       this.is_init = true;
     }
 
@@ -72,7 +72,6 @@ export class DecisionTable {
     const delay = Math.max(2000 - elapsedTime, 0);
   
     await new Promise(resolve => setTimeout(resolve, delay));
-  
     closeLoadingAlert();
     this.file = new File([migrated_xml], this.file.name, { type: "text/xml" });
   }
@@ -95,192 +94,79 @@ export class DecisionTable {
         
       }
     }
-  
-    /**
-     * Recursively retrieves input data from a DRG element.
-     *
-     * @param drg_element The DRG element to retrieve input data from.
-     * @param res The array to store the retrieved input data.
-     * @returns An array of input data.
-     */
-    private recur_get_input_data(
-      drg_element: ExtendedModdleElement,
-      res: Data[] = [],
-    ): Data[] {
-      if (is_ExtendedModdleElement(drg_element) && drg_element.drgElement) {
-        drg_element.drgElement.forEach((element: ExtendedModdleElement) => {
-          this.recur_get_input_data(element, res);
-        });
-      } else if (is_DMN_Decision(drg_element)) {
-        this.extractInputDataFromDecision(drg_element, res);
-      }
-      return res;
-    }
-  
-    /**
-     * Extracts input data from a DMN decision.
-     *
-     * @param decision - The DMN decision object.
-     * @param res - The array to store the extracted input data.
-     */
-    private extractInputDataFromDecision(
-      decision: DMN_Decision,
-      res: Data[],
-    ): void {
-      const decision_table = decision.decisionLogic;
-      if (is_DMN_DecisionTable(decision_table)) {
-        decision_table.input.forEach((input_clause) => {
-          this.extractInputDataFromClause(input_clause, res);
-        });
-      }
-    }
-  
-    /**
-     * Extracts input data from the input clause.
-     *
-     * @param input_clause - The input clause object.
-     * @param res - The array to store the extracted input data.
-     */
-    private extractInputDataFromClause(
-      input_clause: any,
-      res: Data[],
-    ): void {
-      const input_expression = input_clause.inputExpression;
-      if (
-        is_DMN_LiteralExpression(input_expression) &&
-        input_expression.text &&
-        input_expression.typeRef
-      ) {
-        const name = input_expression.text.split(" ")[0];
-        res.push(new Data(name, input_expression.typeRef));
-      }
-    }
-  
-    /**
-     * Defines the input data for the DMN project.
-     *
-     * @returns A Promise that resolves when the input data is defined.
-     */
-    private define_input_data(): void {
-      if (this.dmn_data && this.dmn_data.me) {
-        const input_data = this.recur_get_input_data(this.dmn_data.me);
-        this.dmn_input_data = input_data;
-      } else {
-        // Handle the case where dmn_data or dmn_data.me is not available
-        console.error("DMN data is not initialized.");
-      }
-    }
-  
-    /**
-     * Recursively retrieves output data from a DRG element.
-     *
-     * @param drg_element The DRG element to process.
-     * @param res The array to store the output data.
-     * @returns An array of output data.
-     */
-    private recur_get_output_data(
-      drg_element: ExtendedModdleElement,
-      res: Data[] = [],
-    ): Data[] {
-      if (is_ExtendedModdleElement(drg_element) && drg_element.drgElement) {
-        drg_element.drgElement.forEach((element: ExtendedModdleElement) => {
-          this.recur_get_output_data(element, res);
-        });
-      } else if (is_DMN_Decision(drg_element)) {
-        this.extractOutputDataFromDecision(drg_element, res);
-      }
-      return res;
-    }
-  
-    /**
-     * Extracts output data from a DMN decision.
-     *
-     * @param decision - The DMN decision to extract output data from.
-     * @param res - The input data array.
-     */
-    private extractOutputDataFromDecision(
-      decision: DMN_Decision,
-      res: Data[],
-    ): void {
-      const decision_table = decision.decisionLogic;
-      if (is_DMN_DecisionTable(decision_table)) {
-        decision_table.output.forEach((output_clause) => {
-          this.extractOutputDataFromClause(output_clause, res);
-        });
-      }
-    }
-  
-    /**
-     * Extracts output data from the given output clause and adds it to the provided array.
-     *
-     * @param output_clause - The output clause to extract data from.
-     * @param res - The array to add the extracted data to.
-     */
-    private extractOutputDataFromClause(
-      output_clause: any,
-      res: Data[],
-    ): void {
-      const name = output_clause.name;
-      const type = output_clause.typeRef;
-      res.push(new Data(name, type));
-    }
-  
-    /**
-     * Defines the output data for the DMN project.
-     */
-    private define_output_data(): void {
-      if (this.dmn_data && this.dmn_data.me) {
-        const output_data = this.recur_get_output_data(this.dmn_data.me);
-        this.dmn_output_data = output_data;
-        if (
-          this.dmn_output_data.length === 1 &&
-          this.dmn_output_data[0].name === undefined
-        ) {
-          showWarningAlert("Error parsing DMN file", "No output data found.");
-        }
-      } else {
-        // Handle the case where dmn_data or dmn_data.me is not available
-        console.error("DMN data is not initialized.");
-      }
-    }
-  
-    /**
-     * Defines the rules for the DMN project.
-     * @returns {Array} An array of rules.
-     */
-    private define_rules() {
-      const decision = is_DMN_Definitions(this.dmn_data!.me)
+
+    private define_dmn_decision(): void {
+        //on récupère les décisions
+        const decision = is_DMN_Definitions(this.dmn_data!.me)
         ? this.dmn_data!.me.drgElement.filter(is_DMN_Decision)
         : [];
-      const decision_table = is_DMN_Decision(decision[0])
-        ? decision[0].decisionLogic
-        : null;
-      const rules = is_DMN_DecisionTable(decision_table)
-        ? decision_table.rule
-        : [];
-      this.rules = rules;
-    }
+        this.dmn_decision = decision;
+      }
 
-  /**
-   * Defines the hit policy for the DMN project.
-   */
-  private define_hitPolicy(): void {
-    if (this.dmn_data && this.dmn_data.me) {
-      const decision = is_DMN_Definitions(this.dmn_data.me)
-        ? this.dmn_data.me.drgElement.filter(is_DMN_Decision)
-        : [];
-      const decision_table = is_DMN_Decision(decision[0])
-        ? decision[0].decisionLogic
-        : null;
-      this.hitPolicy = is_DMN_DecisionTable(decision_table) && decision_table.hitPolicy
-        ? decision_table.hitPolicy
-        : "UNIQUE";
-    } else {
-      this.hitPolicy = "UNIQUE";
+  private define_input_data(): void {
+    //on parcourt les informationRequirement si il y a des requiredInput on les ajoute à la liste des input data
+    // si il y a des requiredDecision on les ajoute à la liste des input decision
+    const tmp_decision_tag: String[] = [];
+    const input_data: Data[] = [];
+    const input_decision: DMN_Decision[] = [];
+    this.dmn_decision.forEach((decision) => {
+      decision.informationRequirement?.forEach((info) => {
+        if (info.requiredDecision) {
+          tmp_decision_tag.push(info.requiredDecision.href);
+        }
+      });
+      decision.decisionLogic?.input.forEach((input) => {
+        // on verifie si l'input se trouve dans la liste des input decision (par exemple name = dish et dans input decision on a #dish)
+        const input_expression = input.inputExpression;
+        if (is_DMN_LiteralExpression(input_expression) && input_expression.text && input_expression.typeRef && !tmp_decision_tag.includes("#" + input_expression.text.toLowerCase())) {
+          if (input.label && tmp_decision_tag.includes("#" + input.label.toLowerCase())) {
+            //pass 
+          } else {
+            const name = input_expression.text.split(" ")[0];
+            input_data.push(new Data(name, input_expression.typeRef));
+          }
+        }
+      });
+    });
+    this.dmn_decision.forEach((decision) => {
+      if (tmp_decision_tag.includes("#" + decision.id)) {
+        input_decision.push(decision);
+      }
     }
+    );
+    this.dmn_input_data = input_data;
+    this.dmn_input_decision = input_decision;
   }
+
+  private getDecisionFromReference(reference: DMN_DMNElementReference): DMN_Decision | null {
+    // Assuming `reference.href` is the identifier that can be used to find the corresponding decision
+    // and `this.dmn_decision` is an array of all decisions.
+    const decisionId = reference.href; // Adjust this line to use the actual property that contains the identifier
+    return this.dmn_decision.find(decision => decision.id === decisionId) || null;
+  }
+
+  private define_output_data(): void {
+    const output_data: Data[] = [];
+    if (this.dmn_decision.length === 1 && this.dmn_decision[0].decisionLogic.outputLabel) {
+      output_data.push(new Data(this.dmn_decision[0].decisionLogic.outputLabel, this.dmn_decision[0].decisionLogic.output[0].typeRef));
+      this.dmn_output_data = output_data;
+      return;
+    }
+    this.dmn_decision.forEach((decision) => {
+      decision.decisionLogic?.output.forEach((output) => {
+        if (output.name) {
+          output_data.push({
+            name: output.name,
+            type: output.typeRef,
+          });
+        }
+      });
+    });
+    this.dmn_output_data = output_data;
+  }
+
   
-  }
+}
 
 
 
@@ -291,78 +177,139 @@ export class DecisionTable {
  * @returns The result of the evaluation.
  * @throws Error if the decision table is not initialized or if there is a hit policy violation.
  */
-export function evaluateDecisionTable(decision_table : DecisionTable, json: any): Record<string, any> {
-  if (!decision_table.is_init) {
+export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<string, any> {
+  if (!dmnmodel.is_init) {
     throw new Error("Decision table is not initialized.");
   }
   const results: Record<string, any>[] = [];
-  decision_table.rules.forEach((rule: DMN_DecisionRule) => {
-    const ruleMatch = rule.inputEntry.every((inputEntry, index) => {
-      const inputName = decision_table.dmn_input_data[index].name;
-      const expression = inputEntry.text;
-      if (expression == "") {
-        return true;
+  // on verifie si il y a des input decision
+  if (dmnmodel.dmn_input_decision.length > 0) {
+    // on parcourt les input decision
+    dmnmodel.dmn_input_decision.forEach((decision) => {
+      // on récupère le résultat de l'évaluation de la decision
+      const result = evaluateDecision(dmnmodel, decision, json);
+      // on supprime la decision de dmn_decision
+      dmnmodel.dmn_decision = dmnmodel.dmn_decision.filter((d) => d.id !== decision.id);
+      // on ajoute le résultat à la liste des résultats, en les parcourant si il y a plusieurs résultats
+      if (Array.isArray(result)) {
+        result.forEach((r) => {
+          results.push(r);
+        });
+      } else {
+        results.push(result);
       }
-      return unaryTest(expression, {'?':json[inputName]});
-    });
-
-    if (ruleMatch) {
-      const result: Record<string, any> = {};
-      rule.outputEntry.forEach((outputEntry, index) => {
-        const outputName = decision_table.dmn_output_data[index].name;
-        result[outputName] = outputEntry.text;
+    }
+    );
+  }
+  // on parcourt les decisions restantes
+  dmnmodel.dmn_decision.forEach((decision) => {
+    // on récupère le résultat de l'évaluation de la decision, en passant les input decision en paramètre
+    const result = evaluateDecision(dmnmodel, decision, json, results);
+    // on ajoute le résultat à la liste des résultats
+    if (Array.isArray(result)) {
+      result.forEach((r) => {
+        results.push(r);
       });
+    } else {
       results.push(result);
     }
   });
-
-
-  switch (decision_table.hitPolicy) {
-    case "UNIQUE":
-      if (results.length === 1) {
-        console.log(results[0]);
-        return results[0];
-      } else if (results.length > 1) {
-        throw new Error(
-          "Hit policy violation: More than one rule matched for UNIQUE hit policy.",
-        );
-      }
-      break;
-    case "FIRST":
-      if (results.length > 0) {
-        return results[0];
-      }
-      break;
-    case "ANY":
-      if (
-        results.every(
-          (result) => JSON.stringify(result) === JSON.stringify(results[0]),
-        )
-      ) {
-        return results[0];
-      } else {
-        throw new Error(
-          "Hit policy violation: Different results for ANY hit policy.",
-        );
-      }
-    case "COLLECT":
-      if (results.length > 1) {
-        const result: Record<string, any> = {};
-        results.forEach((res) => {
-          Object.keys(res).forEach((key) => {
-            if (result[key] === undefined) {
-              result[key] = [];
-            }
-            result[key].push(res[key]);
-          });
-        });
-        return result;
-      } else if (results.length === 1) {
-        return results[0];
-      }
-      return results;
-    default:
-      throw new Error("Hit policy not recognized or not implemented.");
+  // on retourne un json si il y a un seul résultat, sinon, on ajoute les résultats dans un json et on le retourne
+  if (results.length === 1) {
+    return results[0];
+  } else {
+    let result: Record<string, any> = {};
+    results.forEach((r) => {
+      result = { ...result, ...r };
+    });
+    return result;
   }
-  return {};
+}
+
+/**
+ * Evaluates a decision based on the provided JSON input.
+ * @param decision - The decision to evaluate.
+ * @param json - The JSON input data.
+ * @param input_decision - The input decision if there is one.
+ * @returns The result of the evaluation.
+ * @throws Error if the decision table is not initialized or if there is a hit policy violation.
+ */
+ export function evaluateDecision(dmnmodel : DMNModel, decision: DMN_Decision, json: any, input_decision?: Record<string, any>[]): Record<string, any> {
+  if (!dmnmodel.is_init) {
+    throw new Error("Decision table is not initialized.");
+  }
+  const results: Record<string, any>[] = [];
+  // on definie hit policy UNIQUE par défaut
+  let hitPolicy = "UNIQUE";
+  // on verifie si il y a un hit policy
+  if (decision.decisionLogic?.hitPolicy && decision.decisionLogic?.hitPolicy !== "") {
+    // on recupere le hit policy
+    hitPolicy = decision.decisionLogic.hitPolicy;
+    
+  }
+  // on verifie si il y a des input decision
+  if (input_decision) {
+    // on parcourt les input decision
+    input_decision.forEach((decision) => {
+      // on modifie le json en ajoutant les input decision
+      json = { ...json, ...decision };
+    });
+  }
+  // on recupere les rules
+  const rules = decision.decisionLogic?.rule;
+  if (rules) {
+    rules.forEach((rule) => {
+      const ruleMatch = rule.inputEntry?.every((inputEntry) => {
+        const inputEntryIndex = rule.inputEntry?.indexOf(inputEntry);
+        const inputName = decision.decisionLogic.input[inputEntryIndex!].inputExpression.text.split(" ")[0];;
+        const inputEntryValue = inputEntry.text;
+        if (inputEntryValue == "") {
+          return true;
+        }
+        return unaryTest(inputEntryValue, {'?':json[inputName]});
+      });
+      if (ruleMatch) {
+        const result: Record<string, any> = {};
+        rule.outputEntry.forEach((outputEntry, index) => {
+          let outputName = decision.decisionLogic?.output[index].name;
+          let outputEntryValue = outputEntry.text;
+          outputEntryValue = outputEntryValue.replace(/"/g, "");
+          if (!outputName || outputName === "") {
+            outputName = decision.decisionLogic?.outputLabel;
+            if (!outputName || outputName === "") {
+              outputName = "undefined"
+            }
+          }
+          result[outputName!] = outputEntryValue;
+        }
+        );
+        results.push(result);
+      }
+      
+    }
+    );
+    if (hitPolicy === "UNIQUE" && results.length > 1) {
+      throw new Error("Hit policy violation.");
+    }
+    if (hitPolicy === "UNIQUE") {
+      return results[0];
+    }
+    if (hitPolicy === "FIRST") {
+      console.log("results");
+      return results[0];
+    }
+    if (hitPolicy === "PRIORITY") {
+      return results[0];
+    }
+    if (hitPolicy === "ANY") {
+      return results[0];
+    }
+    if (hitPolicy === "COLLECT") {
+      return results;
+    }
+    if (hitPolicy === "RULE ORDER") {
+      return results;
+    }
+  }
+  return results;
 }

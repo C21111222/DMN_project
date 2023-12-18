@@ -1,4 +1,4 @@
-import { DecisionTable } from "./decision_table";
+import { DMNModel } from "./decision_table";
 import {DataDisplay} from "./data_display";
 
 
@@ -10,7 +10,7 @@ export class CurrentRun {
   /**
    * The decision table associated with the current run.
    */
-  public decision_table?: DecisionTable;
+  public dmn_model?: DMNModel;
 
   /**
    * The input data for the current run.
@@ -35,10 +35,10 @@ export class CurrentRun {
  *
  * @param decision_table - The `DecisionTable` instance to associate with the current run.
  */
-  public async init(decision_table: DecisionTable) {
-      this.decision_table = decision_table;
-      await this.decision_table.init();
-      this.data_display = new DataDisplay(decision_table);
+  public async init(dmn_model: DMNModel) {
+      this.dmn_model = dmn_model;
+      await this.dmn_model.init();
+      this.data_display = new DataDisplay(dmn_model);
     }
 
   /**
@@ -46,7 +46,7 @@ export class CurrentRun {
    */
   public delete_display() {
     this.data_display!.delete_display();
-    this.decision_table = undefined;
+    this.dmn_model = undefined;
     this.data_input = undefined;
     this.data_display = undefined;
   }

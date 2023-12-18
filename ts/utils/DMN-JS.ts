@@ -107,6 +107,7 @@ export interface DMN_DecisionTable extends ModdleElement {
   output: Array<DMN_OutputClause>;
   rule: Array<DMN_DecisionRule>;
   hitPolicy?: string;
+  outputLabel?: string;
 }
 
 export function is_DMN_DecisionTable(

@@ -1,4 +1,4 @@
-import { DecisionTable } from "./decision_table";
+import { DMNModel } from "./decision_table";
 import { showWarningAlert, showErrorAlert } from "../utils/alert";
 import {Data} from "./data";
 declare const DmnJS: any;
@@ -12,7 +12,7 @@ export class DataDisplay {
      * Creates an instance of the class.
      * @param file The file object.
      */
-    constructor(public decision_table: DecisionTable) {
+    constructor(public dmn_model: DMNModel) {
       this.init();
     }
   
@@ -23,7 +23,6 @@ export class DataDisplay {
      */
     private async init() {
       await this.display_table();
-      await this.decision_table.init();
       this.display_input_data();
     }
   
@@ -32,13 +31,14 @@ export class DataDisplay {
      * @returns {Promise<void>} A promise that resolves when the table is displayed.
      */
     private async display_table() {
-      const xml = await this.decision_table.file.text();
+      const xml = await this.dmn_model.file.text();
       const viewer = new DmnJS({ container: "#canvas" });
   
       try {
         const { warnings } = await viewer.importXML(xml);
         if (warnings.length) {
-          showWarningAlert("DMN Viewer Warnings", warnings.join("\n"));
+          console.warn("Warnings while rendering table:");
+          console.warn(warnings);
         }
       } catch (err) {
         showErrorAlert("Error displaying table", err.message);
@@ -58,7 +58,7 @@ export class DataDisplay {
   
       const table = this.createTable(
         ["Name", "Type"],
-        this.decision_table.dmn_input_data.map((data : Data) => [data.name, data.type]),
+        this.dmn_model.dmn_input_data.map((data : Data) => [data.name, data.type]),
       );
       table_div.appendChild(table);
     }
@@ -106,7 +106,7 @@ export class DataDisplay {
       if (table_div) {
         const table = this.createTable(
           ["Data name", "Data value"],
-          this.decision_table.dmn_output_data.map((data : Data) => [data.name, json[data.name!]]),
+          this.dmn_model.dmn_output_data.map((data : Data) => [data.name, json[data.name!]]),
         );
         table_div.appendChild(table);
         this.show_result();

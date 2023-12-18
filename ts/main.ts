@@ -4,7 +4,7 @@
  * Provides functions for handling DMN and JSON files, updating the form, and displaying results.
  * Supports dragging and moving the modal window.
  */
-import {DecisionTable, evaluateDecisionTable} from "./models/decision_table";
+import {DMNModel, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
@@ -71,7 +71,7 @@ async function handleFiles(files: FileList) {
     } else {
       current_run.delete_display();
     }
-    await current_run.init(new DecisionTable(file));
+    await current_run.init(new DMNModel(file));
     updateForm();
     
   } else if (file.name.endsWith(".json")) {
@@ -85,7 +85,7 @@ async function handleFiles(files: FileList) {
       reader.onload = () => {
         try {
           const json = JSON.parse(reader.result as string);
-          const rsult = evaluateDecisionTable(current_run.decision_table, json);
+          const rsult = evaluateDecisionTable(current_run.dmn_model, json);
           current_run.data_display.delete_result();
           current_run.data_display.hide_result();
           current_run.data_display.display_result(rsult);
@@ -121,12 +121,12 @@ function updateForm() {
   const table = document.getElementById("input_data_table_form") as HTMLTableElement;
   table!.innerHTML = "";
   // on ajoute les lignes, sur chaque ligne on fait une colonne pour le nom et une un input pour la valeur
-  for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
+  for (let i = 0; i < current_run.dmn_model.dmn_input_data.length; i++) {
     const row = table!.insertRow();
     const cell1 = row.insertCell();
     const cell2 = row.insertCell();
-    cell1.innerHTML = current_run.decision_table.dmn_input_data[i].name + " : ";
-    cell2.innerHTML = `<input type="text" id="${current_run.decision_table.dmn_input_data[i].name}" name="${current_run.decision_table.dmn_input_data[i].name}" value="">`;
+    cell1.innerHTML = current_run.dmn_model.dmn_input_data[i].name + " : ";
+    cell2.innerHTML = `<input type="text" id="${current_run.dmn_model.dmn_input_data[i].name}" name="${current_run.dmn_model.dmn_input_data[i].name}" value="">`;
   }
 }
 
@@ -135,11 +135,11 @@ function updateForm() {
  */
 function submitForm() {
   const json: Record<string, any> = {};
-  for (let i = 0; i < current_run.decision_table.dmn_input_data.length; i++) {
-    const input = document.getElementById(current_run.decision_table.dmn_input_data[i].name) as HTMLInputElement;
-    json[current_run.decision_table.dmn_input_data[i].name] = input.value;
+  for (let i = 0; i < current_run.dmn_model.dmn_input_data.length; i++) {
+    const input = document.getElementById(current_run.dmn_model.dmn_input_data[i].name) as HTMLInputElement;
+    json[current_run.dmn_model.dmn_input_data[i].name] = input.value;
   }
-  const rsult = evaluateDecisionTable(current_run.decision_table, json);
+  const rsult = evaluateDecisionTable(current_run.dmn_model, json);
   current_run.data_display.delete_result();
   current_run.data_display.display_result(rsult);
 }

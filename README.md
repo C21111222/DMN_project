@@ -13,6 +13,10 @@ This project provides a web-based interface for viewing and evaluating DMN (Deci
 - Evaluation of decision logic
 - Interactive elements with CSS animations
 
+### Dependencies
+
+- npm
+
 ### Installation
 
 To set up the project locally, follow these steps:
