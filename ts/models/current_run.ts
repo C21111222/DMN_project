@@ -1,7 +1,5 @@
 import { DMNModel } from "./decision_table";
-import {DataDisplay} from "./data_display";
-
-
+import { DataDisplay } from "./data_display";
 
 /**
  * Represents the current run of a process.
@@ -29,17 +27,17 @@ export class CurrentRun {
   constructor(public current_run: boolean = false) {}
 
   /**
- * Initializes the current run with a given decision table.
- * It sets the `decision_table` property to the provided decision table
- * and creates a new `DataDisplay` instance for that decision table.
- *
- * @param decision_table - The `DecisionTable` instance to associate with the current run.
- */
+   * Initializes the current run with a given decision table.
+   * It sets the `decision_table` property to the provided decision table
+   * and creates a new `DataDisplay` instance for that decision table.
+   *
+   * @param decision_table - The `DecisionTable` instance to associate with the current run.
+   */
   public async init(dmn_model: DMNModel) {
-      this.dmn_model = dmn_model;
-      await this.dmn_model.init();
-      this.data_display = new DataDisplay(dmn_model);
-    }
+    this.dmn_model = dmn_model;
+    await this.dmn_model.init();
+    this.data_display = new DataDisplay(dmn_model);
+  }
 
   /**
    * Deletes the data display for the current run.
@@ -51,4 +49,3 @@ export class CurrentRun {
     this.data_display = undefined;
   }
 }
-

@@ -56,8 +56,12 @@ setTimeout(function () {
       let delta_x_right = X_right - x;
       let delta_y_left = Y_left - y;
       let delta_y_right = Y_right - y;
-      let distance_left: number = Math.sqrt(delta_x_left ** 2 + delta_y_left ** 2);
-      let distance_right: number = Math.sqrt(delta_x_right ** 2 + delta_y_right ** 2);
+      let distance_left: number = Math.sqrt(
+        delta_x_left ** 2 + delta_y_left ** 2,
+      );
+      let distance_right: number = Math.sqrt(
+        delta_x_right ** 2 + delta_y_right ** 2,
+      );
 
       // Calculate the angle assuming a right-angled triangle, using the cosine rule.
       let adjacent_left = Math.abs(x - X_left);
@@ -92,10 +96,12 @@ setTimeout(function () {
       }
 
       // Apply a CSS transform to move the eyes to follow the cursor.
-      right_eye.style.transform =
-        `translate(${distance_right * Math.cos(angle_right) * -1}px, ${distance_right * Math.sin(angle_right) * -1}px)`;
-      left_eye.style.transform =
-        `translate(${distance_left * Math.cos(angle_left) * -1}px, ${distance_left * Math.sin(angle_left) * -1}px)`;
+      right_eye.style.transform = `translate(${
+        distance_right * Math.cos(angle_right) * -1
+      }px, ${distance_right * Math.sin(angle_right) * -1}px)`;
+      left_eye.style.transform = `translate(${
+        distance_left * Math.cos(angle_left) * -1
+      }px, ${distance_left * Math.sin(angle_left) * -1}px)`;
     }
   });
 }, 2000);

@@ -1,8 +1,8 @@
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export function showErrorAlert(title: string, text: string): void {
   Swal.fire({
-    icon: 'error',
+    icon: "error",
     title: title,
     text: text,
   });
@@ -10,7 +10,7 @@ export function showErrorAlert(title: string, text: string): void {
 
 export function showSuccessAlert(title: string, text: string): void {
   Swal.fire({
-    icon: 'success',
+    icon: "success",
     title: title,
     text: text,
   });
@@ -18,7 +18,7 @@ export function showSuccessAlert(title: string, text: string): void {
 
 export function showWarningAlert(title: string, text: string): void {
   Swal.fire({
-    icon: 'warning',
+    icon: "warning",
     title: title,
     text: text,
   });
