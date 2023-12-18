@@ -1,4 +1,8 @@
-declare const DmnModdle: any;
+/**
+ * This file contains the migration logic for DMN diagrams base on https://github.com/bpmn-io/dmn-migrate
+ * - migrateDiagram
+ * - needsMigration
+*/
 import Ids from 'ids';
 
 import {
@@ -10,6 +14,7 @@ import {
 
 import BiodiPackage from './biodi.json';
 
+declare const DmnModdle: any;
 const ids = new Ids([ 32, 36, 1 ]);
 
 const moddle = new DmnModdle({
