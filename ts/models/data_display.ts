@@ -99,7 +99,6 @@ export class DataDisplay {
      * @param json - The JSON object containing the data values.
      */
     public display_result(json: any) {
-      //on utilise createTable pour créer le tableau :
       const table_div = document.getElementById(
         "output_data_table",
       ) as HTMLTableElement;

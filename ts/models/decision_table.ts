@@ -96,7 +96,6 @@ export class DMNModel {
     }
 
     private define_dmn_decision(): void {
-        //on récupère les décisions
         const decision = is_DMN_Definitions(this.dmn_data!.me)
         ? this.dmn_data!.me.drgElement.filter(is_DMN_Decision)
         : [];
@@ -104,8 +103,6 @@ export class DMNModel {
       }
 
   private define_input_data(): void {
-    //on parcourt les informationRequirement si il y a des requiredInput on les ajoute à la liste des input data
-    // si il y a des requiredDecision on les ajoute à la liste des input decision
     const tmp_decision_tag: String[] = [];
     const input_data: Data[] = [];
     const input_decision: DMN_Decision[] = [];
@@ -116,11 +113,10 @@ export class DMNModel {
         }
       });
       decision.decisionLogic?.input.forEach((input) => {
-        // on verifie si l'input se trouve dans la liste des input decision (par exemple name = dish et dans input decision on a #dish)
         const input_expression = input.inputExpression;
         if (is_DMN_LiteralExpression(input_expression) && input_expression.text && input_expression.typeRef && !tmp_decision_tag.includes("#" + input_expression.text.toLowerCase())) {
           if (input.label && tmp_decision_tag.includes("#" + input.label.toLowerCase())) {
-            //pass 
+            //pass
           } else {
             const name = input_expression.text.split(" ")[0];
             input_data.push(new Data(name, input_expression.typeRef));
@@ -136,13 +132,6 @@ export class DMNModel {
     );
     this.dmn_input_data = input_data;
     this.dmn_input_decision = input_decision;
-  }
-
-  private getDecisionFromReference(reference: DMN_DMNElementReference): DMN_Decision | null {
-    // Assuming `reference.href` is the identifier that can be used to find the corresponding decision
-    // and `this.dmn_decision` is an array of all decisions.
-    const decisionId = reference.href; // Adjust this line to use the actual property that contains the identifier
-    return this.dmn_decision.find(decision => decision.id === decisionId) || null;
   }
 
   private define_output_data(): void {
@@ -182,15 +171,10 @@ export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<st
     throw new Error("Decision table is not initialized.");
   }
   const results: Record<string, any>[] = [];
-  // on verifie si il y a des input decision
   if (dmnmodel.dmn_input_decision.length > 0) {
-    // on parcourt les input decision
     dmnmodel.dmn_input_decision.forEach((decision) => {
-      // on récupère le résultat de l'évaluation de la decision
       const result = evaluateDecision(dmnmodel, decision, json);
-      // on supprime la decision de dmn_decision
       dmnmodel.dmn_decision = dmnmodel.dmn_decision.filter((d) => d.id !== decision.id);
-      // on ajoute le résultat à la liste des résultats, en les parcourant si il y a plusieurs résultats
       if (Array.isArray(result)) {
         result.forEach((r) => {
           results.push(r);
@@ -201,11 +185,8 @@ export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<st
     }
     );
   }
-  // on parcourt les decisions restantes
   dmnmodel.dmn_decision.forEach((decision) => {
-    // on récupère le résultat de l'évaluation de la decision, en passant les input decision en paramètre
     const result = evaluateDecision(dmnmodel, decision, json, results);
-    // on ajoute le résultat à la liste des résultats
     if (Array.isArray(result)) {
       result.forEach((r) => {
         results.push(r);
@@ -214,7 +195,7 @@ export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<st
       results.push(result);
     }
   });
-  // on retourne un json si il y a un seul résultat, sinon, on ajoute les résultats dans un json et on le retourne
+  console.log(results);
   if (results.length === 1) {
     return results[0];
   } else {
@@ -239,23 +220,16 @@ export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<st
     throw new Error("Decision table is not initialized.");
   }
   const results: Record<string, any>[] = [];
-  // on definie hit policy UNIQUE par défaut
   let hitPolicy = "UNIQUE";
-  // on verifie si il y a un hit policy
   if (decision.decisionLogic?.hitPolicy && decision.decisionLogic?.hitPolicy !== "") {
-    // on recupere le hit policy
     hitPolicy = decision.decisionLogic.hitPolicy;
     
   }
-  // on verifie si il y a des input decision
   if (input_decision) {
-    // on parcourt les input decision
     input_decision.forEach((decision) => {
-      // on modifie le json en ajoutant les input decision
       json = { ...json, ...decision };
     });
   }
-  // on recupere les rules
   const rules = decision.decisionLogic?.rule;
   if (rules) {
     rules.forEach((rule) => {
@@ -288,28 +262,40 @@ export function evaluateDecisionTable(dmnmodel : DMNModel, json: any): Record<st
       
     }
     );
-    if (hitPolicy === "UNIQUE" && results.length > 1) {
-      throw new Error("Hit policy violation.");
-    }
-    if (hitPolicy === "UNIQUE") {
-      return results[0];
-    }
-    if (hitPolicy === "FIRST") {
-      console.log("results");
-      return results[0];
-    }
-    if (hitPolicy === "PRIORITY") {
-      return results[0];
-    }
-    if (hitPolicy === "ANY") {
-      return results[0];
-    }
-    if (hitPolicy === "COLLECT") {
-      return results;
-    }
-    if (hitPolicy === "RULE ORDER") {
-      return results;
+    switch (hitPolicy) {
+      case "UNIQUE":
+        if ( results.length > 1) {
+          throw new Error("Hit policy violation.");
+        }
+        return results[0];
+      case "FIRST":
+        return results[0];
+      case "ANY":
+        return results[0];
+      case "PRIORITY":
+        return results[0];
+      case "COLLECT":
+        if (results.length > 1) {
+          const result: Record<string, any> = {};
+          results.forEach((res) => {
+            Object.keys(res).forEach((key) => {
+              if (result[key] === undefined) {
+                result[key] = [];
+              }
+              result[key].push(res[key]);
+            });
+          });
+          return result;
+        } else if (results.length === 1) {
+          return results[0];
+        }
+        return results;
+      case "RULE ORDER":
+        return results;
+      default:
+        return results[0];
     }
   }
-  return results;
+  return {};
+
 }

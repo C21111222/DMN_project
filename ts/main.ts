@@ -8,11 +8,10 @@ import {DMNModel, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
-// Declare external libraries without TypeScript definitions.
 declare const DmnJS: any;
 declare const DmnModdle: any;
 
-// Get the HTML elements for file drop area and file input.
+
 const dropArea = document.getElementById("mouth")!;
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 
@@ -120,13 +119,36 @@ function openForm() {
 function updateForm() {
   const table = document.getElementById("input_data_table_form") as HTMLTableElement;
   table!.innerHTML = "";
-  // on ajoute les lignes, sur chaque ligne on fait une colonne pour le nom et une un input pour la valeur
   for (let i = 0; i < current_run.dmn_model.dmn_input_data.length; i++) {
     const row = table!.insertRow();
     const cell1 = row.insertCell();
     const cell2 = row.insertCell();
     cell1.innerHTML = current_run.dmn_model.dmn_input_data[i].name + " : ";
-    cell2.innerHTML = `<input type="text" id="${current_run.dmn_model.dmn_input_data[i].name}" name="${current_run.dmn_model.dmn_input_data[i].name}" value="">`;
+    const input = document.createElement("input");
+    input.setAttribute("type", "text");
+    input.setAttribute("id", current_run.dmn_model.dmn_input_data[i].name);
+    cell2.appendChild(input);
+    if (current_run.dmn_model.dmn_input_data[i].type.includes("number")   || current_run.dmn_model.dmn_input_data[i].type.includes("integer")) {
+      input.setAttribute("type", "number");
+      input.setAttribute("min", "0");
+      input.setAttribute("max", "100");
+    } else if (current_run.dmn_model.dmn_input_data[i].type == "date") {
+      input.setAttribute("type", "date");
+    } else if (current_run.dmn_model.dmn_input_data[i].type == "boolean") {
+      const select = document.createElement("select");
+      select.setAttribute("id", current_run.dmn_model.dmn_input_data[i].name);
+      const option1 = document.createElement("option");
+      option1.setAttribute("value", "true");
+      option1.innerHTML = "true";
+      const option2 = document.createElement("option");
+      option2.setAttribute("value", "false");
+      option2.innerHTML = "false";
+      select.appendChild(option1);
+      select.appendChild(option2);
+      cell2.appendChild(select);
+      cell2.removeChild(input);
+    }
+
   }
 }
 
