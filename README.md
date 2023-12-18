@@ -30,7 +30,7 @@ To set up the project locally, follow these steps:
 
 To use the tool:
 
-1. Open `index.html` in a modern web browser.
+1. Open `index.html` with a live server in a modern web browser.
 2. Drag and drop a DMN file onto the designated area.
 3. View the decision table and input data.
 4. Evaluate decision logic by providing inputs or using the provided form, observing the output.
