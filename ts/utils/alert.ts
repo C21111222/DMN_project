@@ -23,3 +23,18 @@ export function showWarningAlert(title: string, text: string): void {
     text: text,
   });
 }
+
+export function showLoadingAlert(title: string, text: string): void {
+  Swal.fire({
+    title: title,
+    text: text,
+    allowOutsideClick: false,
+    willOpen: () => {
+      Swal.showLoading();
+    },
+  });
+}
+
+export function closeLoadingAlert(): void {
+  Swal.close();
+}

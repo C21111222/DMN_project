@@ -1,5 +1,4 @@
 declare const DmnModdle: any;
-
 import Ids from 'ids';
 
 import {
@@ -20,6 +19,16 @@ const moddle = new DmnModdle({
 const DMN11URI = '"http://www.omg.org/spec/DMN/20151101/dmn.xsd"';
 const DMN12URI = '"http://www.omg.org/spec/DMN/20180521/MODEL/"';
 const DMN13URI = '"https://www.omg.org/spec/DMN/20191111/MODEL/"';
+/**
+ * Check if XML needs migration.
+ *  
+ * @param {string} xml
+ *  
+ * @returns {boolean}
+ * */
+export function needsMigration(xml: any) {
+  return hasNamespace(DMN11URI, xml) || hasNamespace(DMN12URI, xml);
+}
 
 /**
  * Migrate DMN 1.1 XML to 1.3.
@@ -29,31 +38,26 @@ const DMN13URI = '"https://www.omg.org/spec/DMN/20191111/MODEL/"';
  * @returns {Promise<string>}
  */
 export async function migrateDiagram(xml: any) {
-  return new Promise((resolve, reject) => {
-    if (!isString(xml)) {
+  if (!isString(xml)) {
+    return xml; // retourne le XML sans migration
+  }
 
-      // return XML without migrating
-      return resolve(xml);
+  try {
+    if (hasNamespace(DMN11URI, xml)) {
+      console.log("Migration de DMN 1.1 à 1.3");
+      return await migrateFrom11To13(xml); // Utilisez await directement
+    } else if (hasNamespace(DMN12URI, xml)) {
+      console.log("Migration de DMN 1.2 à 1.3");
+      return migrateFrom12To13(xml); // Cette fonction n'est pas asynchrone, donc pas besoin de await
+    } else if (hasNamespace(DMN13URI, xml)) {
+      console.log("DMN 1.3 déjà présent");
+      return xml;
     }
+  } catch (err) {
+    throw err; // Relancez l'erreur pour qu'elle soit attrapée par l'appelant
+  }
 
-    try {
-      if (hasNamespace(DMN11URI, xml)) {
-        console.log("Migrating from DMN 1.1 to 1.3");
-        return resolve(migrateFrom11To13(xml));
-      } else if (hasNamespace(DMN12URI, xml)) {
-        console.log("Migrating from DMN 1.2 to 1.3");
-        return resolve(migrateFrom12To13(xml));
-      } else if (hasNamespace(DMN13URI, xml)) {
-        console.log("DMN 1.3 already");
-        return resolve(xml);
-      }
-    } catch (err) {
-      return reject(err);
-    }
-
-    // return XML without migrating
-    return resolve(xml);
-  });
+  return xml; // retourne le XML sans migration
 }
 
 /**
@@ -90,39 +94,21 @@ function migrateFrom12To13(xml: any) {
  *
  * @returns {string}
  */
-function migrateFrom11To13(xml: any) {
-    console.log("Migrating from DMN 1.1 to 1.3");
-  return new Promise((resolve, reject) => {
-    const namespaceReplacedXML = xml.replace(DMN11URI, DMN13URI);
-    console.log("namespaceReplacedXML: ", namespaceReplacedXML);
+async function migrateFrom11To13(xml: any) {
+  const namespaceReplacedXML = xml.replace(DMN11URI, DMN13URI);
 
-    moddle.fromXML(namespaceReplacedXML, 'dmn:Definitions', (parsingError: any, definitions: any) => {
-        console.log("definitions: ", definitions);
-      if (parsingError) {
+  try {
+    const { rootElement: definitions } = await moddle.fromXML(namespaceReplacedXML, 'dmn:Definitions');
 
-        // return XML without migrating
-        return resolve(xml);
-      }
+    addIds(definitions);
+    addNames(definitions);
+    migrateDI(definitions, moddle);
 
-      try {
-        addIds(definitions);
-
-        addNames(definitions);
-
-        migrateDI(definitions, moddle);
-      } catch (migrationError) {
-        return reject(migrationError);
-      }
-
-      moddle.toXML(definitions, { format: true }, (serializationError: any, migratedXML: any) => {
-        if (serializationError) {
-          return reject(serializationError);
-        } else {
-          return resolve(migratedXML);
-        }
-      });
-    });
-  });
+    const { xml: migratedXML } = await moddle.toXML(definitions, { format: true });
+    return migratedXML;
+  } catch (error) {
+    throw error; // L'erreur sera propagée à l'appelant de la fonction
+  }
 }
 
 export const TARGET_DMN_VERSION = '1.3';
@@ -160,11 +146,9 @@ interface TypeWithDollarType {
   
   // Update the forEach loop in the addIds function
   function addIds(element: any) {
-    console.log("addIds: ", element);
     addId(element);
   
     Object.values(element).forEach(value => {
-        console.log("value: ", value);
       if (isTypeWithDollarType(value)) {
         addId(value);
         addIds(value);
@@ -193,11 +177,9 @@ function addName(element: any) {
  * @param {Object} element
  */
 function addNames(element: any) {
-    console.log("addNames: ", element);
   addName(element);
 
   Object.values(element).forEach(value => {
-    console.log("value: ", value);
     if (isTypeWithDollarType(value)) {
       addName(value);
       addNames(value);

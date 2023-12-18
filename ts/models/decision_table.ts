@@ -9,13 +9,12 @@ import {
     ModdleElement,
     is_DMN_Definitions,
     is_DMN_Decision,
-    is_DMN_InputData,
     is_DMN_DecisionTable,
 } from "../utils/DMN-JS";
 import { unaryTest } from "feelin";
 import { Data } from "./data";
-import  { showErrorAlert, showWarningAlert } from "../utils/alert";
-import { migrateDiagram } from "../utils/migrate_DMN";
+import  { showErrorAlert, showWarningAlert, showLoadingAlert, closeLoadingAlert } from "../utils/alert";
+import { migrateDiagram, needsMigration } from "../utils/migrate_DMN";
 declare const DmnModdle: any;
 
 /**
@@ -61,9 +60,20 @@ export class DecisionTable {
    */
   private async manage_dmn_version(): Promise<void> {
     const xml = await this.file.text();
-    console.log("migrating")
+    if (!needsMigration(xml)) {
+      return;
+    }
+    showLoadingAlert("Migrating DMN file to version 1.3.0", "Please wait...");
+  
+    const startTime = Date.now();
     const migrated_xml = await migrateDiagram(xml) as string;
-    console.log("migrated")
+    
+    const elapsedTime = Date.now() - startTime;
+    const delay = Math.max(2000 - elapsedTime, 0);
+  
+    await new Promise(resolve => setTimeout(resolve, delay));
+  
+    closeLoadingAlert();
     this.file = new File([migrated_xml], this.file.name, { type: "text/xml" });
   }
 
