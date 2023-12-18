@@ -8,6 +8,7 @@ This project provides a web-based interface for viewing and evaluating DMN (Deci
 ### Features
 
 - Drag and Drop DMN file upload
+- Migration of DMN files 1.1/1.2 to 1.3 if necessary
 - Display of DMN decision tables
 - Evaluation of decision logic
 - Interactive elements with CSS animations
