@@ -58,9 +58,15 @@ div#moove {
     cursor: move; 
     border-radius: 25px;
     width: 100%;
-    height: 3%;
+    height: 10px;
 }
-
+div#moove_table {
+    cursor: move; 
+    border-radius: 25px;
+    width: 100%;
+    height: 30px;
+    top:0;
+}
 div#inputDataModal {
     display: none;
 
@@ -77,10 +83,9 @@ div#inputDataModal {
     box-shadow: 5px 5px 8px rgb(133, 133, 133);
 
 }
-
 div#close {
     position: absolute;
-    top: 80%;
+    top: 82%;
     right: 0;
     padding: 10px;
     cursor: pointer;
@@ -237,47 +242,7 @@ div#top_bar {
 
 
 
-table.tjs-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: 1px solid #ccc;
-    width: 100%;
-    margin-bottom: 1em;
-    background-color: #fff;
-    color: #000;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    font-family: 'Cambria';
-    font-size: 16px;
-}
 
-table.tjs-table tbody {
-    border: 1px solid #ccc;
-
-}
-
-div.powered-by {
-    display: none;
-}
-
-div.decision-table-name {
-    font-family: 'Cambria';
-    font-size: 20px;
-    font-weight: bold;
-}
-
-table.tjs-table thead {
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-}
-
-table.tjs-table th,
-table.tjs-table td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
-}
 
 div#screen_data {
     width: 70vw;
@@ -302,17 +267,7 @@ div#screen_data {
 
   }
   
-  div#canvas {
-    position: absolute;
-    top: 45px;
-    width: 100%;
-    height: calc(65vh - 50px); /* Subtract the height of the top bar from the height of the screen data */
-    background-color: rgb(240, 240, 240);
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-  }
   
 div#title_data {
     text-align: left;

@@ -1,7 +1,9 @@
 import { DMNModel } from "./decision_table";
 import { showWarningAlert, showErrorAlert } from "../utils/alert";
 import { Data } from "./data";
+import { extractDecisionById } from "../utils/xml_parser";
 declare const DmnJS: any;
+
 
 /**
  * Represents a class for displaying data in a decision table.
@@ -49,30 +51,37 @@ export class DataDisplay {
    * @returns {Promise<void>} A promise that resolves when the subtables are displayed.
    */
   private async display_subtables() {
-    const subtables = this.dmn_model.dmn_decision;
-
-    // Ensure the container for subtables exists
-    const subtablesContainer = document.getElementById('subtables-container');
-    if (!subtablesContainer) {
-      console.error('Subtables container not found');
+    // on teste si le fichier contient des sous-tables
+    if (this.dmn_model.dmn_decision.length <= 1) {
       return;
     }
+    const subtables = this.dmn_model.dmn_decision;
 
-    // Clear previous subtables
-    subtablesContainer.innerHTML = '';
-
-    // Iterate over each decision and create a div for it
-    subtables.forEach((decision, index) => {
-      const decisionDiv = document.createElement('div');
-      decisionDiv.id = `decision-table-${index}`;
-      decisionDiv.classList.add('decision-table');
-      subtablesContainer.appendChild(decisionDiv);
-
-      // Now use DmnJS to display the decision table inside the created div
-      const viewer = new DmnJS({
-        container: `#decision-table-${index}`
-      });
-    });
+    for (const [index, decision] of subtables.entries()) {
+      const xml = await this.dmn_model.file.text();
+      let newxml: string = extractDecisionById(xml, decision.id!);
+      const div = document.createElement("div");
+      div.id = `subtable_${decision.id}`;
+      div.classList.add("subtable");
+      div.setAttribute("hidden", "");
+      
+      const subtablesContainer = document.getElementById("canvas_subtable");
+      if (subtablesContainer) {
+        subtablesContainer.appendChild(div);
+      } else {
+        showErrorAlert("Error displaying subtable", "Subtables container not found");
+      }
+      try {
+        const viewer = new DmnJS({ container: `#subtable_${decision.id}` });
+        const { warnings } = await viewer.importXML(newxml);
+        if (warnings.length) {
+          console.warn("Warnings while rendering subtable:");
+          console.warn(warnings);
+        }
+      } catch (err) {
+        showErrorAlert("Error displaying subtable", err.message);
+      }
+    }
   }
 
   /**
@@ -165,6 +174,12 @@ export class DataDisplay {
     }
   }
 
+  public hide_subtables() {
+    const subtables = document.getElementById("canvas_subtable") as HTMLDivElement;
+    subtables.setAttribute("hidden", "");
+    
+  }
+
   public delete_result() {
     this.clearElementById("output_data_table");
   }
@@ -177,6 +192,7 @@ export class DataDisplay {
     this.clearElementById("input_data_table");
     this.clearElementById("output_data_table");
     this.hide_result();
+    this.hide_subtables();
   }
 
   /**

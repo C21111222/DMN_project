@@ -187,11 +187,15 @@ export function evaluateDecisionTable(
   if (!dmnmodel.is_init) {
     throw new Error("Decision table is not initialized.");
   }
+  let dmn_decision: DMN_Decision[] = [];
+  dmnmodel.dmn_decision.forEach((decision) => {
+    dmn_decision.push(decision);
+  });
   const results: Record<string, any>[] = [];
   if (dmnmodel.dmn_input_decision.length > 0) {
     dmnmodel.dmn_input_decision.forEach((decision) => {
       const result = evaluateDecision(dmnmodel, decision, json);
-      dmnmodel.dmn_decision = dmnmodel.dmn_decision.filter(
+      dmn_decision = dmn_decision.filter(
         (d) => d.id !== decision.id,
       );
       if (Array.isArray(result)) {
@@ -203,7 +207,7 @@ export function evaluateDecisionTable(
       }
     });
   }
-  dmnmodel.dmn_decision.forEach((decision) => {
+  dmn_decision.forEach((decision) => {
     const result = evaluateDecision(dmnmodel, decision, json, results);
     if (Array.isArray(result)) {
       result.forEach((r) => {

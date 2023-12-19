@@ -9,6 +9,8 @@ import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
 
+
+
 const dropArea = document.getElementById("mouth")!;
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 
@@ -20,9 +22,6 @@ closeBtn.addEventListener("click", closeForm);
 
 const submitBtn = document.getElementById("submit")!;
 submitBtn.addEventListener("click", submitForm);
-
-const modal = document.getElementById('inputDataModal');
-const header = document.getElementById('moove');
 
 
 // Initialize the current run state.
@@ -174,27 +173,49 @@ function closeForm() {
 }
 
 
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
+class DraggableModal {
+  private isDragging = false;
+  private offsetX = 0;
+  private offsetY = 0;
+  private header: HTMLElement;
 
-header.addEventListener('mousedown', (e: MouseEvent) => {
-  isDragging = true;
-  offsetX = e.clientX - modal.getBoundingClientRect().left;
-  offsetY = e.clientY - modal.getBoundingClientRect().top;
-  e.preventDefault();
-});
-
-document.addEventListener('mousemove', (e: MouseEvent) => {
-  if (isDragging) {
-    modal.style.left = `${e.clientX - offsetX}px`;
-    modal.style.top = `${e.clientY - offsetY}px`;
+  constructor(public modal: HTMLElement, headerSelector: string) {
+    this.header = modal.querySelector(headerSelector) as HTMLElement;
+    this.attachEventListeners();
   }
+
+  private attachEventListeners() {
+    this.header.addEventListener('mousedown', this.startDrag.bind(this));
+    document.addEventListener('mousemove', this.onDrag.bind(this));
+    document.addEventListener('mouseup', this.stopDrag.bind(this));
+  }
+
+  private startDrag(e: MouseEvent) {
+    this.isDragging = true;
+    const rect = this.modal.getBoundingClientRect();
+    this.offsetX = e.clientX - rect.left;
+    this.offsetY = e.clientY - rect.top;
+    e.preventDefault();
+  }
+
+  private onDrag(e: MouseEvent) {
+    if (!this.isDragging) return;
+    this.modal.style.left = `${e.clientX - this.offsetX}px`;
+    this.modal.style.top = `${e.clientY - this.offsetY}px`;
+  }
+
+  private stopDrag() {
+    this.isDragging = false;
+  }
+}
+
+// Initialisation pour toutes les modales sur la page avec un en-tête spécifique.
+const modals = document.querySelectorAll('.modal');
+modals.forEach(modal => {
+  new DraggableModal(modal as HTMLElement, '.modal-header');
 });
 
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
+
 
 function define_dmn_object(){
   // on recupere les objetc de type <g class="djs-element djs-shape" data-element-id="beverages" transform="matrix(1, 0, 0, 1, 540, 86)" style="display: block;">
@@ -203,24 +224,31 @@ function define_dmn_object(){
   // on parcours les objets et on les garde si leur data-element-id est dans la liste des decisions
   const dmn_decisions = current_run.dmn_model.dmn_decision;
   const dmn_decisions_id = dmn_decisions.map((decision) => decision.id);
-  console.log(dmn_decisions_id);
-  const dmn_objects_to_keep = [];
+  const parent = document.getElementById("subtables")!;
+  const canvas_subtable = document.getElementById("canvas_subtable")!;
   for (let i = 0; i < dmn_objects.length; i++) {
     const dmn_object = dmn_objects[i];
     const dmn_object_id = dmn_object.getAttribute("data-element-id");
     if (dmn_decisions_id.includes(dmn_object_id)) {
-      // on ajoute des event listener pour les objets, si on clique dessus on ouvre la table de decision
       dmn_object.addEventListener("click", (e) => {
         const dmn_object_id = dmn_object.getAttribute("data-element-id");
         const dmn_decision = current_run.dmn_model.dmn_decision.find((decision) => decision.id == dmn_object_id);
-        const dmn_decision_table_div = document.getElementById(dmn_decision!.id)!;
+        for (let i = 0; i < canvas_subtable.children.length; i++) {
+          (canvas_subtable.children[i] as HTMLElement).style.display = "none";
+        }
+        const dmn_decision_table_div = document.getElementById("subtable_" + dmn_decision!.id)!;
         dmn_decision_table_div.style.display = "block";
-        const dmn_decision_table_close_btn = document.getElementById(dmn_decision!.id + "_close")!;
-        dmn_decision_table_close_btn.addEventListener("click", (e) => {
-          dmn_decision_table_div.style.display = "none";
-        });
+        parent.style.display = "block";
+        canvas_subtable.style.display = "block";
       });
       
     }
   }
+  const dmn_decision_table_close_btn = document.getElementById("closeSubtableBtn")!;
+  dmn_decision_table_close_btn.addEventListener("click", (e) => {
+    parent.style.display = "none";
+    for (let i = 0; i < canvas_subtable.children.length; i++) {
+      (canvas_subtable.children[i] as HTMLElement).style.display = "none";
+    }
+  });
 }

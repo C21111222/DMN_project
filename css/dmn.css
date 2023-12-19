@@ -17,3 +17,75 @@ div.dmn-drd-container{
     width: 100%;
     height: 100%;
   }
+
+div#canvas_subtables{
+    width: 50%;
+    height: 100%;
+  }
+
+div#subtables{
+    width: 1000px;
+    height: auto;
+    display: none;
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    background-color: rgb(201, 196, 196);
+    border-radius: 25px;
+    padding: 10px;
+    border: 3px solid var(--speech_border);
+  }
+
+  div#canvas {
+    position: absolute;
+    top: 45px;
+    width: 100%;
+    height: calc(65vh - 50px); /* Subtract the height of the top bar from the height of the screen data */
+    background-color: rgb(240, 240, 240);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  table.tjs-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 1em;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Cambria';
+    font-size: 16px;
+}
+
+table.tjs-table tbody {
+    border: 1px solid #ccc;
+
+}
+
+div.powered-by {
+    display: none;
+}
+
+div.decision-table-name {
+    font-family: 'Cambria';
+    font-size: 20px;
+    font-weight: bold;
+}
+
+table.tjs-table thead {
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+}
+
+table.tjs-table th,
+table.tjs-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
