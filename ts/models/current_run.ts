@@ -37,13 +37,16 @@ export class CurrentRun {
     this.dmn_model = dmn_model;
     await this.dmn_model.init();
     this.data_display = new DataDisplay(dmn_model);
+    await this.data_display.init();
   }
 
   /**
    * Deletes the data display for the current run.
    */
   public delete_display() {
-    this.data_display!.delete_display();
+    if (this.data_display) {
+      this.data_display!.delete_display();
+    }
     this.dmn_model = undefined;
     this.data_input = undefined;
     this.data_display = undefined;

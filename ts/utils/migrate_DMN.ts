@@ -39,25 +39,25 @@ export function needsMigration(xml: any) {
  */
 export async function migrateDiagram(xml: any) {
   if (!isString(xml)) {
-    return xml; // retourne le XML sans migration
+    return xml; 
   }
 
   try {
     if (hasNamespace(DMN11URI, xml)) {
       console.log("Migration de DMN 1.1 à 1.3");
-      return await migrateFrom11To13(xml); // Utilisez await directement
+      return await migrateFrom11To13(xml); 
     } else if (hasNamespace(DMN12URI, xml)) {
       console.log("Migration de DMN 1.2 à 1.3");
-      return migrateFrom12To13(xml); // Cette fonction n'est pas asynchrone, donc pas besoin de await
+      return await migrateFrom12To13(xml); 
     } else if (hasNamespace(DMN13URI, xml)) {
       console.log("DMN 1.3 déjà présent");
       return xml;
     }
   } catch (err) {
-    throw err; // Relancez l'erreur pour qu'elle soit attrapée par l'appelant
+    throw err;
   }
 
-  return xml; // retourne le XML sans migration
+  return xml; 
 }
 
 /**
@@ -117,7 +117,7 @@ async function migrateFrom11To13(xml: any) {
     });
     return migratedXML;
   } catch (error) {
-    throw error; // L'erreur sera propagée à l'appelant de la fonction
+    throw error; 
   }
 }
 

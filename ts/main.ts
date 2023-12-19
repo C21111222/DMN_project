@@ -24,6 +24,7 @@ submitBtn.addEventListener("click", submitForm);
 const modal = document.getElementById('inputDataModal');
 const header = document.getElementById('moove');
 
+
 // Initialize the current run state.
 const current_run = new CurrentRun(false);
 
@@ -68,6 +69,8 @@ async function handleFiles(files: FileList) {
       current_run.delete_display();
     }
     await current_run.init(new DMNModel(file));
+
+    define_dmn_object();
     updateForm();
     
   } else if (file.name.endsWith(".json")) {
@@ -192,3 +195,32 @@ document.addEventListener('mousemove', (e: MouseEvent) => {
 document.addEventListener('mouseup', () => {
   isDragging = false;
 });
+
+function define_dmn_object(){
+  // on recupere les objetc de type <g class="djs-element djs-shape" data-element-id="beverages" transform="matrix(1, 0, 0, 1, 540, 86)" style="display: block;">
+  const dmn_objects = document.getElementsByClassName("djs-element djs-shape");
+  var arr = [...dmn_objects];
+  // on parcours les objets et on les garde si leur data-element-id est dans la liste des decisions
+  const dmn_decisions = current_run.dmn_model.dmn_decision;
+  const dmn_decisions_id = dmn_decisions.map((decision) => decision.id);
+  console.log(dmn_decisions_id);
+  const dmn_objects_to_keep = [];
+  for (let i = 0; i < dmn_objects.length; i++) {
+    const dmn_object = dmn_objects[i];
+    const dmn_object_id = dmn_object.getAttribute("data-element-id");
+    if (dmn_decisions_id.includes(dmn_object_id)) {
+      // on ajoute des event listener pour les objets, si on clique dessus on ouvre la table de decision
+      dmn_object.addEventListener("click", (e) => {
+        const dmn_object_id = dmn_object.getAttribute("data-element-id");
+        const dmn_decision = current_run.dmn_model.dmn_decision.find((decision) => decision.id == dmn_object_id);
+        const dmn_decision_table_div = document.getElementById(dmn_decision!.id)!;
+        dmn_decision_table_div.style.display = "block";
+        const dmn_decision_table_close_btn = document.getElementById(dmn_decision!.id + "_close")!;
+        dmn_decision_table_close_btn.addEventListener("click", (e) => {
+          dmn_decision_table_div.style.display = "none";
+        });
+      });
+      
+    }
+  }
+}

@@ -12,7 +12,6 @@ export class DataDisplay {
    * @param file The file object.
    */
   constructor(public dmn_model: DMNModel) {
-    this.init();
   }
 
   /**
@@ -20,9 +19,10 @@ export class DataDisplay {
    * and displaying the input and output data.
    * @returns {Promise<void>} A promise that resolves when the initialization is complete.
    */
-  private async init() {
+  public async init() {
     await this.display_table();
     this.display_input_data();
+    await this.display_subtables();
   }
 
   /**
@@ -42,6 +42,37 @@ export class DataDisplay {
     } catch (err) {
       showErrorAlert("Error displaying table", err.message);
     }
+  }
+
+  /**
+   * Displays the subtables.
+   * @returns {Promise<void>} A promise that resolves when the subtables are displayed.
+   */
+  private async display_subtables() {
+    const subtables = this.dmn_model.dmn_decision;
+
+    // Ensure the container for subtables exists
+    const subtablesContainer = document.getElementById('subtables-container');
+    if (!subtablesContainer) {
+      console.error('Subtables container not found');
+      return;
+    }
+
+    // Clear previous subtables
+    subtablesContainer.innerHTML = '';
+
+    // Iterate over each decision and create a div for it
+    subtables.forEach((decision, index) => {
+      const decisionDiv = document.createElement('div');
+      decisionDiv.id = `decision-table-${index}`;
+      decisionDiv.classList.add('decision-table');
+      subtablesContainer.appendChild(decisionDiv);
+
+      // Now use DmnJS to display the decision table inside the created div
+      const viewer = new DmnJS({
+        container: `#decision-table-${index}`
+      });
+    });
   }
 
   /**
