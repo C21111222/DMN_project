@@ -8,9 +8,6 @@ import {DMNModel, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
 import { showErrorAlert } from "./utils/alert";
 
-declare const DmnJS: any;
-declare const DmnModdle: any;
-
 
 const dropArea = document.getElementById("mouth")!;
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;

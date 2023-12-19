@@ -10,9 +10,9 @@ import {
   ModdleElement,
   is_DMN_Definitions,
   is_DMN_Decision,
-  is_DMN_DecisionTable,
+  is_DMN_DecisionTable
 } from "../utils/DMN-JS";
-import { unaryTest } from "feelin";
+import { unaryTest, InterpreterContext } from "feelin";
 import { Data } from "./data";
 import {
   showErrorAlert,
@@ -267,6 +267,15 @@ export function evaluateDecision(
         const inputEntryValue = inputEntry.text;
         if (inputEntryValue == "") {
           return true;
+        } 
+        if (inputEntryValue == "true" || inputEntryValue == "false") {
+          const expression = 'a = b'; 
+          const context: InterpreterContext = {
+            a: inputEntryValue, 
+            b: json[inputName]
+          };
+
+          return unaryTest(expression, context);
         }
         return unaryTest(inputEntryValue, { "?": json[inputName] });
       });
