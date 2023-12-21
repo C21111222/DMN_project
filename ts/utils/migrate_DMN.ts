@@ -1,5 +1,5 @@
 /**
- * This file contains the migration logic for DMN diagrams base on https://github.com/bpmn-io/dmn-migrate
+ * This file contains the migration logic for DMN diagrams based on https://github.com/bpmn-io/dmn-migrate
  * - migrateDiagram
  * - needsMigration
  */
@@ -39,16 +39,16 @@ export function needsMigration(xml: any) {
  */
 export async function migrateDiagram(xml: any) {
   if (!isString(xml)) {
-    return xml; 
+    return xml;
   }
 
   try {
     if (hasNamespace(DMN11URI, xml)) {
       console.log("Migration de DMN 1.1 à 1.3");
-      return await migrateFrom11To13(xml); 
+      return await migrateFrom11To13(xml);
     } else if (hasNamespace(DMN12URI, xml)) {
       console.log("Migration de DMN 1.2 à 1.3");
-      return await migrateFrom12To13(xml); 
+      return await migrateFrom12To13(xml);
     } else if (hasNamespace(DMN13URI, xml)) {
       console.log("DMN 1.3 déjà présent");
       return xml;
@@ -57,7 +57,7 @@ export async function migrateDiagram(xml: any) {
     throw err;
   }
 
-  return xml; 
+  return xml;
 }
 
 /**
@@ -117,7 +117,7 @@ async function migrateFrom11To13(xml: any) {
     });
     return migratedXML;
   } catch (error) {
-    throw error; 
+    throw error;
   }
 }
 

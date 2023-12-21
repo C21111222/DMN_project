@@ -10,7 +10,7 @@ import {
   ModdleElement,
   is_DMN_Definitions,
   is_DMN_Decision,
-  is_DMN_DecisionTable
+  is_DMN_DecisionTable,
 } from "../utils/DMN-JS";
 import { unaryTest, InterpreterContext } from "feelin";
 import { Data } from "./data";
@@ -25,14 +25,15 @@ declare const DmnModdle: any;
 
 /**
  * Represents a DMN file, based on the DMN-JS moddle.
- * 
+ *
  * @property dmn_data - The DMN data.
  * @property dmn_input_data - The input data.
  * @property dmn_output_data - The output data.
- * @property is_init - Indicates if the DMN data is initialized.
+ * @property is_init - A flag indicating if the DMN file is initialized.
+ * @property dmn_decision - The DMN decision.
+ * @property dmn_input_decision - The input decision.
+ * @property file - The DMN file.
  * @property dmnModdle - The DMN moddle.
-* @property file - The file object.
-  
  */
 export class DMNModel {
   private dmnModdle = new DmnModdle();
@@ -98,6 +99,9 @@ export class DMNModel {
     }
   }
 
+  /**
+   * Defines the DMN decision by filtering the DRG elements and assigning the result to the dmn_decision property.
+   */
   private define_dmn_decision(): void {
     const decision = is_DMN_Definitions(this.dmn_data!.me)
       ? this.dmn_data!.me.drgElement.filter(is_DMN_Decision)
@@ -105,6 +109,9 @@ export class DMNModel {
     this.dmn_decision = decision;
   }
 
+  /**
+   * Defines the input data for the decision table.
+   */
   private define_input_data(): void {
     const tmp_decision_tag: String[] = [];
     const input_data: Data[] = [];
@@ -144,6 +151,9 @@ export class DMNModel {
     this.dmn_input_decision = input_decision;
   }
 
+  /**
+   * Defines the output data for the decision table.
+   */
   private define_output_data(): void {
     const output_data: Data[] = [];
     if (
@@ -195,9 +205,7 @@ export function evaluateDecisionTable(
   if (dmnmodel.dmn_input_decision.length > 0) {
     dmnmodel.dmn_input_decision.forEach((decision) => {
       const result = evaluateDecision(dmnmodel, decision, json);
-      dmn_decision = dmn_decision.filter(
-        (d) => d.id !== decision.id,
-      );
+      dmn_decision = dmn_decision.filter((d) => d.id !== decision.id);
       if (Array.isArray(result)) {
         result.forEach((r) => {
           results.push(r);
@@ -271,12 +279,12 @@ export function evaluateDecision(
         const inputEntryValue = inputEntry.text;
         if (inputEntryValue == "") {
           return true;
-        } 
+        }
         if (inputEntryValue == "true" || inputEntryValue == "false") {
-          const expression = 'a = b'; 
+          const expression = "a = b";
           const context: InterpreterContext = {
-            a: inputEntryValue, 
-            b: json[inputName]
+            a: inputEntryValue,
+            b: json[inputName],
           };
 
           return unaryTest(expression, context);

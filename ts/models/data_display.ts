@@ -4,17 +4,19 @@ import { Data } from "./data";
 import { extractDecisionById } from "../utils/xml_parser";
 declare const DmnJS: any;
 
-
 /**
  * Represents a class for displaying data in a decision table.
+ * This class is responsible for displaying the table, input data, and output data.
+ * It also handles the display of the result.
+ * @class
+ * @property {DMNModel} dmn_model - The DMN model.
  */
 export class DataDisplay {
   /**
    * Creates an instance of the class.
-   * @param file The file object.
+   * @param {DMNModel} dmn_model - The DMN model.
    */
-  constructor(public dmn_model: DMNModel) {
-  }
+  constructor(public dmn_model: DMNModel) {}
 
   /**
    * Initializes the class by displaying the table, initializing the decision table,
@@ -24,7 +26,7 @@ export class DataDisplay {
   public async init() {
     await this.display_table();
     this.display_input_data();
-    await this.display_subtables();
+    await this.create_subtables();
   }
 
   /**
@@ -47,10 +49,10 @@ export class DataDisplay {
   }
 
   /**
-   * Displays the subtables.
+   * Create the subtables (represented by the <decision> elements in the DMN XML).
    * @returns {Promise<void>} A promise that resolves when the subtables are displayed.
    */
-  private async display_subtables() {
+  private async create_subtables() {
     // on teste si le fichier contient des sous-tables
     if (this.dmn_model.dmn_decision.length <= 1) {
       return;
@@ -64,12 +66,15 @@ export class DataDisplay {
       div.id = `subtable_${decision.id}`;
       div.classList.add("subtable");
       div.setAttribute("hidden", "");
-      
+
       const subtablesContainer = document.getElementById("canvas_subtable");
       if (subtablesContainer) {
         subtablesContainer.appendChild(div);
       } else {
-        showErrorAlert("Error displaying subtable", "Subtables container not found");
+        showErrorAlert(
+          "Error displaying subtable",
+          "Subtables container not found",
+        );
       }
       try {
         const viewer = new DmnJS({ container: `#subtable_${decision.id}` });
@@ -156,6 +161,9 @@ export class DataDisplay {
     }
   }
 
+  /**
+   * Affiche le résultat en rendant visible l'élément de tableau spécifié.
+   */
   public show_result() {
     const table_div = document.getElementById(
       "output_data_div",
@@ -165,6 +173,9 @@ export class DataDisplay {
     }
   }
 
+  /**
+   * Hides the result by setting the display style of the output_data_div table element to "none".
+   */
   public hide_result() {
     const table_div = document.getElementById(
       "output_data_div",
@@ -174,12 +185,19 @@ export class DataDisplay {
     }
   }
 
+  /**
+   * Hides the subtables.
+   */
   public hide_subtables() {
-    const subtables = document.getElementById("canvas_subtable") as HTMLDivElement;
+    const subtables = document.getElementById(
+      "canvas_subtable",
+    ) as HTMLDivElement;
     subtables.setAttribute("hidden", "");
-    
   }
 
+  /**
+   * Deletes the result by clearing the element with the specified ID.
+   */
   public delete_result() {
     this.clearElementById("output_data_table");
   }
