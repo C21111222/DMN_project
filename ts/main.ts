@@ -6,7 +6,8 @@
  */
 import {DMNModel, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
-import { showErrorAlert } from "./utils/alert";
+import { showErrorAlert, showWarningAlert } from "./utils/alert";
+import { DraggableModal } from "./models/draggable_modal";
 
 const dropArea = document.getElementById("mouth")!;
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
@@ -50,47 +51,39 @@ fileInput.addEventListener("change", (e) => {
 });
 
 /**
- * Handles the files dropped or selected by the user.
- * If a DMN file is provided, it initializes the display and decision table.
- * If a JSON file is provided, it processes the file for evaluation.
- * @param files - The list of files to handle.
+ * Handles the processing of dropped or selected files.
+ * If a DMN file is dropped or selected, it initializes the DMN model and updates the form.
+ * If a JSON file is dropped or selected, it evaluates the decision table with the JSON data.
+ * Displays the result or shows an error if the file format is incorrect or no DMN model is selected.
+ * @param {FileList} files - The list of files dropped or selected by the user.
  */
 async function handleFiles(files: FileList) {
   const file = files[0];
   if (file.name.endsWith(".dmn")) {
-    // Handle DMN file
-    if (current_run.current_run == false) {
-      current_run.current_run = true;
-    } else {
-      current_run.delete_display();
-    }
+    current_run.current_run ? current_run.delete_display() : current_run.current_run = true;
     await current_run.init(new DMNModel(file));
-
     define_dmn_object();
     updateForm();
-    
   } else if (file.name.endsWith(".json")) {
-    // Handle JSON file
-    if (current_run.current_run == false) {
-      // Trigger an error notification if DMN file is not selected first.
+    if (!current_run.current_run) {
       showErrorAlert("Error", "Please select a DMN file first.");
-    } else {
-      const reader = new FileReader();
-      reader.readAsText(file);
-      reader.onload = () => {
-        try {
-          const json = JSON.parse(reader.result as string);
-          const rsult = evaluateDecisionTable(current_run.dmn_model, json);
-          current_run.data_display.delete_result();
-          current_run.data_display.hide_result();
-          current_run.data_display.display_result(rsult);
-        } catch (e) {
-          console.error("Failed to parse JSON or invalid data format:");
-          console.error(e);
-        }
-      };
-
+      return;
     }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const json = JSON.parse(e.target.result as string);
+        const result = evaluateDecisionTable(current_run.dmn_model, json);
+        current_run.data_display.delete_result();
+        current_run.data_display.hide_result();
+        current_run.data_display.display_result(result);
+      } catch (e) {
+        console.error("Failed to parse JSON or invalid data format:", e);
+      }
+    };
+    reader.readAsText(file);
+  } else {
+    showWarningAlert("Warning", "hmm... I don't think that's a DMN or JSON file.")
   }
 }
 
@@ -110,56 +103,55 @@ function openForm() {
 }
 
 /**
- * Updates the form with input data from the current run's decision table.
+ * Updates the form with input fields based on the DMN model's input data.
+ * It clears the existing form, iterates over the input data definitions,
+ * and creates corresponding form elements with appropriate attributes and identifiers.
  */
 function updateForm() {
   const table = document.getElementById("input_data_table_form") as HTMLTableElement;
-  table!.innerHTML = "";
-  for (let i = 0; i < current_run.dmn_model.dmn_input_data.length; i++) {
-    const row = table!.insertRow();
+  table.innerHTML = "";
+  current_run.dmn_model.dmn_input_data.forEach(inputData => {
+    const row = table.insertRow();
     const cell1 = row.insertCell();
     const cell2 = row.insertCell();
-    cell1.innerHTML = current_run.dmn_model.dmn_input_data[i].name + " : ";
-    const input = document.createElement("input");
-    input.setAttribute("type", "text");
-    input.setAttribute("id", current_run.dmn_model.dmn_input_data[i].name);
-    cell2.appendChild(input);
-    if (current_run.dmn_model.dmn_input_data[i].type.includes("number")   || current_run.dmn_model.dmn_input_data[i].type.includes("integer")) {
-      input.setAttribute("type", "number");
-      input.setAttribute("min", "0");
-      input.setAttribute("max", "100");
-    } else if (current_run.dmn_model.dmn_input_data[i].type == "date") {
-      input.setAttribute("type", "date");
-    } else if (current_run.dmn_model.dmn_input_data[i].type == "boolean") {
-      const select = document.createElement("select");
-      select.setAttribute("id", current_run.dmn_model.dmn_input_data[i].name);
-      const option1 = document.createElement("option");
-      option1.setAttribute("value", "true");
-      option1.innerHTML = "true";
-      const option2 = document.createElement("option");
-      option2.setAttribute("value", "false");
-      option2.innerHTML = "false";
-      select.appendChild(option1);
-      select.appendChild(option2);
-      cell2.appendChild(select);
-      cell2.removeChild(input);
+    cell1.textContent = `${inputData.name} : `;
+    
+    let inputElement: HTMLElement;
+    if (inputData.type === "boolean") {
+      inputElement = document.createElement("select");
+      ["true", "false"].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        inputElement.appendChild(option);
+      });
+    } else {
+      inputElement = document.createElement("input");
+      inputElement.setAttribute("type", inputData.type.includes("number") || inputData.type.includes("integer") ? "number" : inputData.type);
+      if (inputElement instanceof HTMLInputElement && inputElement.type === "number") {
+        inputElement.setAttribute("min", "0");
+        inputElement.setAttribute("max", "100");
+      }
     }
-
-  }
+    inputElement.setAttribute("id", inputData.name);
+    cell2.appendChild(inputElement);
+  });
 }
 
 /**
- * Submits the form and performs the necessary actions based on the input data.
+ * Submits the form data and evaluates the decision table.
+ * It collects the input data from the form, creates a JSON object,
+ * evaluates the decision table with the input data, and displays the result.
  */
 function submitForm() {
-  const json: Record<string, any> = {};
-  for (let i = 0; i < current_run.dmn_model.dmn_input_data.length; i++) {
-    const input = document.getElementById(current_run.dmn_model.dmn_input_data[i].name) as HTMLInputElement;
-    json[current_run.dmn_model.dmn_input_data[i].name] = input.value;
-  }
-  const rsult = evaluateDecisionTable(current_run.dmn_model, json);
+  const json = Array.from(current_run.dmn_model.dmn_input_data).reduce((acc, input_data) => {
+    const input = document.getElementById(input_data.name) as HTMLInputElement;
+    acc[input_data.name] = input.value;
+    return acc;
+  }, {} as Record<string, any>);
+  const result = evaluateDecisionTable(current_run.dmn_model, json);
   current_run.data_display.delete_result();
-  current_run.data_display.display_result(rsult);
+  current_run.data_display.display_result(result);
 }
 
 /**
@@ -169,44 +161,10 @@ function closeForm() {
   document.getElementById('inputDataModal').style.display = 'none';
 }
 
-
-class DraggableModal {
-  private isDragging = false;
-  private offsetX = 0;
-  private offsetY = 0;
-  private header: HTMLElement;
-
-  constructor(public modal: HTMLElement, headerSelector: string) {
-    this.header = modal.querySelector(headerSelector) as HTMLElement;
-    this.attachEventListeners();
-  }
-
-  private attachEventListeners() {
-    this.header.addEventListener('mousedown', this.startDrag.bind(this));
-    document.addEventListener('mousemove', this.onDrag.bind(this));
-    document.addEventListener('mouseup', this.stopDrag.bind(this));
-  }
-
-  private startDrag(e: MouseEvent) {
-    this.isDragging = true;
-    const rect = this.modal.getBoundingClientRect();
-    this.offsetX = e.clientX - rect.left;
-    this.offsetY = e.clientY - rect.top;
-    e.preventDefault();
-  }
-
-  private onDrag(e: MouseEvent) {
-    if (!this.isDragging) return;
-    this.modal.style.left = `${e.clientX - this.offsetX}px`;
-    this.modal.style.top = `${e.clientY - this.offsetY}px`;
-  }
-
-  private stopDrag() {
-    this.isDragging = false;
-  }
-}
-
-// Initialisation pour toutes les modales sur la page avec un en-tête spécifique.
+/**
+ * Initializes draggable functionality for all modal elements.
+ * It attaches a DraggableModal instance to each modal found in the document.
+ */
 const modals = document.querySelectorAll('.modal');
 modals.forEach(modal => {
   new DraggableModal(modal as HTMLElement, '.modal-header');
@@ -214,38 +172,36 @@ modals.forEach(modal => {
 
 
 
+/**
+ * Defines the DMN object by attaching click event listeners to DMN decision elements.
+ * When a DMN decision element is clicked, it hides all children of the canvas_subtable
+ * and displays the corresponding decision table. It also sets up the close button to hide
+ * the decision tables and all its children.
+ */
 function define_dmn_object(){
-  // on recupere les objetc de type <g class="djs-element djs-shape" data-element-id="beverages" transform="matrix(1, 0, 0, 1, 540, 86)" style="display: block;">
   const dmn_objects = document.getElementsByClassName("djs-element djs-shape");
-  var arr = [...dmn_objects];
-  // on parcours les objets et on les garde si leur data-element-id est dans la liste des decisions
-  const dmn_decisions = current_run.dmn_model.dmn_decision;
-  const dmn_decisions_id = dmn_decisions.map((decision) => decision.id);
+  const dmn_decisions_id = current_run.dmn_model.dmn_decision.map((decision) => decision.id);
   const parent = document.getElementById("subtables")!;
   const canvas_subtable = document.getElementById("canvas_subtable")!;
   for (let i = 0; i < dmn_objects.length; i++) {
     const dmn_object = dmn_objects[i];
     const dmn_object_id = dmn_object.getAttribute("data-element-id");
     if (dmn_decisions_id.includes(dmn_object_id)) {
-      dmn_object.addEventListener("click", (e) => {
-        const dmn_object_id = dmn_object.getAttribute("data-element-id");
-        const dmn_decision = current_run.dmn_model.dmn_decision.find((decision) => decision.id == dmn_object_id);
-        for (let i = 0; i < canvas_subtable.children.length; i++) {
-          (canvas_subtable.children[i] as HTMLElement).style.display = "none";
+      dmn_object.addEventListener("click", () => {
+        for (let child of canvas_subtable.children) {
+          (child as HTMLElement).style.display = "none";
         }
-        const dmn_decision_table_div = document.getElementById("subtable_" + dmn_decision!.id)!;
+        const dmn_decision_table_div = document.getElementById("subtable_" + dmn_object_id)!;
         dmn_decision_table_div.style.display = "block";
         parent.style.display = "block";
         canvas_subtable.style.display = "block";
       });
-      
     }
   }
-  const dmn_decision_table_close_btn = document.getElementById("closeSubtableBtn")!;
-  dmn_decision_table_close_btn.addEventListener("click", (e) => {
+  document.getElementById("closeSubtableBtn")!.addEventListener("click", () => {
     parent.style.display = "none";
-    for (let i = 0; i < canvas_subtable.children.length; i++) {
-      (canvas_subtable.children[i] as HTMLElement).style.display = "none";
+    for (let child of canvas_subtable.children) {
+      (child as HTMLElement).style.display = "none";
     }
   });
 }

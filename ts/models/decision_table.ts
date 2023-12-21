@@ -1,22 +1,16 @@
 import {
-  DMN_DecisionRule,
-  ExtendedModdleElement,
   is_DMN_LiteralExpression,
-  is_ExtendedModdleElement,
-  DMN_DMNElementReference,
   DMN_Decision,
   DMN_data,
   DMN_file,
   ModdleElement,
   is_DMN_Definitions,
   is_DMN_Decision,
-  is_DMN_DecisionTable,
 } from "../utils/DMN-JS";
 import { unaryTest, InterpreterContext } from "feelin";
 import { Data } from "./data";
 import {
   showErrorAlert,
-  showWarningAlert,
   showLoadingAlert,
   closeLoadingAlert,
 } from "../utils/alert";
@@ -44,12 +38,15 @@ export class DMNModel {
   public dmn_decision: DMN_Decision[] = [];
   public dmn_input_decision: DMN_Decision[] = [];
 
+  /**
+   * Constructs a new DMNModel instance.
+   * @param file - The DMN file to be processed.
+   */
   constructor(public file: File) {}
 
   /**
    * Initializes the class by defining DMN data, input data, and output data.
-   * Sets the `is_init` flag to true.
-   * Logs the result of defining rules.
+   * Sets the `is_init` flag to true after successful initialization.
    * @returns {Promise<void>} A promise that resolves when initialization is complete.
    */
   public async init() {
@@ -62,7 +59,8 @@ export class DMNModel {
   }
 
   /**
-   * Defines the version of the DMN file and modifies it for compatibility to 1.3.0.
+   * Checks the version of the DMN file and migrates it to version 1.3.0 if necessary.
+   * @returns {Promise<void>} A promise that resolves when the migration is complete or not needed.
    */
   private async manage_dmn_version(): Promise<void> {
     const xml = await this.file.text();
@@ -83,7 +81,7 @@ export class DMNModel {
   }
 
   /**
-   * Defines the DMN data by parsing the XML content of the file.
+   * Parses the XML content of the DMN file and defines the DMN data.
    * @returns {Promise<void>} A promise that resolves when the DMN data is defined.
    */
   private async define_dmn_data(): Promise<void> {
@@ -100,7 +98,8 @@ export class DMNModel {
   }
 
   /**
-   * Defines the DMN decision by filtering the DRG elements and assigning the result to the dmn_decision property.
+   * Filters the DRG elements to define the DMN decisions.
+   * Assigns the filtered decisions to the dmn_decision property.
    */
   private define_dmn_decision(): void {
     const decision = is_DMN_Definitions(this.dmn_data!.me)
@@ -110,7 +109,7 @@ export class DMNModel {
   }
 
   /**
-   * Defines the input data for the decision table.
+   * Defines the input data for the decision table by processing the decision logic.
    */
   private define_input_data(): void {
     const tmp_decision_tag: String[] = [];
@@ -152,7 +151,7 @@ export class DMNModel {
   }
 
   /**
-   * Defines the output data for the decision table.
+   * Defines the output data for the decision table by processing the decision logic.
    */
   private define_output_data(): void {
     const output_data: Data[] = [];
@@ -182,6 +181,8 @@ export class DMNModel {
     this.dmn_output_data = output_data;
   }
 }
+
+type ResultType = Record<string, string>;
 
 /**
  * Evaluates a decision table based on the provided JSON input.
@@ -225,7 +226,6 @@ export function evaluateDecisionTable(
       results.push(result);
     }
   });
-  console.log(results);
   if (results.length === 1) {
     return results[0];
   } else {
@@ -255,16 +255,10 @@ export function evaluateDecision(
     throw new Error("Decision table is not initialized.");
   }
   const results: Record<string, any>[] = [];
-  let hitPolicy = "UNIQUE";
-  if (
-    decision.decisionLogic?.hitPolicy &&
-    decision.decisionLogic?.hitPolicy !== ""
-  ) {
-    hitPolicy = decision.decisionLogic.hitPolicy;
-  }
+  const hitPolicy = decision.decisionLogic?.hitPolicy || "UNIQUE";
   if (input_decision) {
-    input_decision.forEach((decision) => {
-      json = { ...json, ...decision };
+    input_decision.forEach((dec) => {
+      json = { ...json, ...dec };
     });
   }
   const rules = decision.decisionLogic?.rule;
@@ -292,54 +286,36 @@ export function evaluateDecision(
         return unaryTest(inputEntryValue, { "?": json[inputName] });
       });
       if (ruleMatch) {
-        const result: Record<string, any> = {};
-        rule.outputEntry.forEach((outputEntry, index) => {
-          let outputName = decision.decisionLogic?.output[index].name;
-          let outputEntryValue = outputEntry.text;
-          outputEntryValue = outputEntryValue.replace(/"/g, "");
-          if (!outputName || outputName === "") {
-            outputName = decision.decisionLogic?.outputLabel;
-            if (!outputName || outputName === "") {
-              outputName = "undefined";
-            }
-          }
-          result[outputName!] = outputEntryValue;
-        });
+        const result = rule.outputEntry.reduce(
+          (acc: ResultType, outputEntry, index) => {
+            const outputName =
+              decision.decisionLogic?.output[index].name ||
+              decision.decisionLogic?.outputLabel ||
+              "undefined";
+            acc[outputName] = outputEntry.text.replace(/"/g, "");
+            return acc;
+          },
+          {} as ResultType,
+        );
         results.push(result);
       }
     });
-    switch (hitPolicy) {
-      case "UNIQUE":
-        if (results.length > 1) {
-          throw new Error("Hit policy violation.");
-        }
-        return results[0];
-      case "FIRST":
-        return results[0];
-      case "ANY":
-        return results[0];
-      case "PRIORITY":
-        return results[0];
-      case "COLLECT":
-        if (results.length > 1) {
-          const result: Record<string, any> = {};
-          results.forEach((res) => {
-            Object.keys(res).forEach((key) => {
-              if (result[key] === undefined) {
-                result[key] = [];
-              }
-              result[key].push(res[key]);
-            });
-          });
-          return result;
-        } else if (results.length === 1) {
-          return results[0];
-        }
-      case "RULE ORDER":
-        return results;
-      default:
-        return results[0];
-    }
   }
-  return {};
+  if (results.length === 0) return {};
+  if (hitPolicy === "COLLECT" && results.length > 1) {
+    return results.reduce((acc, res) => {
+      Object.keys(res).forEach((key) => {
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(res[key]);
+      });
+      return acc;
+    }, {});
+  }
+  if (
+    ["UNIQUE", "FIRST", "ANY", "PRIORITY"].includes(hitPolicy) &&
+    results.length > 1
+  ) {
+    throw new Error("Hit policy violation.");
+  }
+  return results[0];
 }
