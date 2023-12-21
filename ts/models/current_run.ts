@@ -1,5 +1,5 @@
 import { DMNModel } from "./decision_table";
-import { DataDisplay } from "./data_display";
+import { DataDisplay } from "../view/data_display";
 
 /**
  * Represents the current run of a process.

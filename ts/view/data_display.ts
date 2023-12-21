@@ -1,6 +1,6 @@
-import { DMNModel } from "./decision_table";
+import { DMNModel } from "../models/decision_table";
 import { showWarningAlert, showErrorAlert } from "../utils/alert";
-import { Data } from "./data";
+import { Data } from "../models/data";
 import { extractDecisionById } from "../utils/xml_parser";
 declare const DmnJS: any;
 
