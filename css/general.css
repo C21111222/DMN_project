@@ -287,34 +287,9 @@ p#title {
     font-weight: bold;
     color: var(--speech_color);
 }
-div.speech {
-    box-sizing: border-box;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: var(--speech_color);
-    border-top: 5px solid var(--speech_border);
-    width:600px;
-}
-div#speech1 {
-    width:300px;
-}
 
-div#speech3 {
-    width:90%;
-    margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
-    gap:2px;
-}
 
-.line {
-    width:100vw;
-}
-#line1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+
 .center {
     display: flex;
     flex-direction: column;
@@ -341,9 +316,7 @@ div#speech3 {
     align-items: center;
     justify-content: center;
 }
-#variable_to_predict {
-    width:80%;
-}
+
 .underline {
     text-decoration: underline;
 }
@@ -355,15 +328,4 @@ div#speech3 {
     border-width: 35px 25px 0 0;
     border-color: var(--speech_color) transparent transparent transparent;
     transform: rotate(30deg);
-}
-
-#btn_download {
-    height: 50px;
-    width: 200px;
-    border : 3px solid rgb(153, 0, 0);
-    background-color: orange;
-    margin-bottom: 50px;
-    border-radius: 5px;
-    font-family: 'Cambria';
-    font-size: 16px;
 }
