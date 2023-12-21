@@ -5,7 +5,7 @@
  */
 export class Data {
   /**
-   * Creates an instance of InputData.
+   * Creates an instance of Data.
    * @param name - The name of the input data.
    * @param type - The type of the input data.
    */
