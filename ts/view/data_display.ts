@@ -192,9 +192,8 @@ export class DataDisplay {
     const subtables = document.getElementById(
       "canvas_subtable",
     ) as HTMLDivElement;
-    const subtables_div = subtables.getElementsByClassName("subtable");
-    for (let i = 0; i < subtables_div.length; i++) {
-      const subtable = subtables_div[i];
+    const subtables_div = Array.from(subtables.getElementsByClassName("subtable"));
+    for (const subtable of subtables_div) {
       subtable.remove();
     }
     subtables.setAttribute("hidden", "");
