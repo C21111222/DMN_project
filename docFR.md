@@ -1,7 +1,7 @@
 # Introduction
 L'objectif de ce projet était de pouvoir afficher et évaluer un fichier DMN. Ce rapport explique l'architecture du projet ainsi que les choix de conception, les fonctionnalités principales, et les librairies utilisées pour atteindre ces objectifs. Le code source est également disponible ici [C21111222/DMN_project](https://github.com/C21111222/DMN_project).
 
-![style image](img/style.PNG)
+![style image](image/style.PNG)
 
 # Organisation du code
 ## Structure des dossiers
