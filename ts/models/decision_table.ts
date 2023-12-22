@@ -50,11 +50,24 @@ export class DMNModel {
    * @returns {Promise<void>} A promise that resolves when initialization is complete.
    */
   public async init() {
-    await this.manage_dmn_version();
-    await this.define_dmn_data();
-    await this.define_dmn_decision();
-    this.define_input_data();
-    this.define_output_data();
+    try {
+      await this.manage_dmn_version();
+    } catch (error) {
+      showErrorAlert("Error migrating DMN file", error);
+    }
+    try {
+      await this.define_dmn_data();
+    }catch (error) {
+      showErrorAlert("Error parsing DMN file", error);
+    }
+    try {
+      this.define_dmn_decision();
+      this.define_input_data();
+      this.define_output_data();
+    }
+    catch (error) {
+      showErrorAlert("Error parsing DMN file", error);
+    }
     this.is_init = true;
   }
 
