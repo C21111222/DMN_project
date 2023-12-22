@@ -1,5 +1,5 @@
 import { DMNModel } from "../models/decision_table";
-import { showWarningAlert, showErrorAlert } from "../utils/alert";
+import {showErrorAlert } from "../utils/alert";
 import { Data } from "../models/data";
 import { extractDecisionById } from "../utils/xml_parser";
 declare const DmnJS: any;
@@ -61,7 +61,7 @@ export class DataDisplay {
 
     for (const [index, decision] of subtables.entries()) {
       const xml = await this.dmn_model.file.text();
-      let newxml: string = extractDecisionById(xml, decision.id!);
+      const newxml: string = extractDecisionById(xml, decision.id!);
       const div = document.createElement("div");
       div.id = `subtable_${decision.id}`;
       div.classList.add("subtable");

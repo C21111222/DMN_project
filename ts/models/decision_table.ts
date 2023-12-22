@@ -112,7 +112,7 @@ export class DMNModel {
    * Defines the input data for the decision table by processing the decision logic.
    */
   private define_input_data(): void {
-    const tmp_decision_tag: String[] = [];
+    const tmp_decision_tag: string[] = [];
     const input_data: Data[] = [];
     const input_decision: DMN_Decision[] = [];
     this.dmn_decision.forEach((decision) => {

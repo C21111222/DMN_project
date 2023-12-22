@@ -148,7 +148,7 @@ function submitForm() {
     const input = document.getElementById(input_data.name) as HTMLInputElement;
     acc[input_data.name] = input.value;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, string | number | boolean>);
   const result = evaluateDecisionTable(current_run.dmn_model, json);
   current_run.data_display.delete_result();
   current_run.data_display.display_result(result);
@@ -188,7 +188,7 @@ function define_dmn_object(){
     const dmn_object_id = dmn_object.getAttribute("data-element-id");
     if (dmn_decisions_id.includes(dmn_object_id)) {
       dmn_object.addEventListener("click", () => {
-        for (let child of canvas_subtable.children) {
+        for (const child of canvas_subtable.children) {
           (child as HTMLElement).style.display = "none";
         }
         const dmn_decision_table_div = document.getElementById("subtable_" + dmn_object_id)!;
@@ -200,7 +200,7 @@ function define_dmn_object(){
   }
   document.getElementById("closeSubtableBtn")!.addEventListener("click", () => {
     parent.style.display = "none";
-    for (let child of canvas_subtable.children) {
+    for (const child of canvas_subtable.children) {
       (child as HTMLElement).style.display = "none";
     }
   });
