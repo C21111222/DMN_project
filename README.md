@@ -35,7 +35,11 @@ To use the tool:
 3. View the decision table and input data.
 4. Evaluate decision logic by providing inputs or using the provided form, observing the output.
 
-To generate documentation:
+### Documentation
+
+Detailed general documentation in English can be found in the file `docEN.md`.
+
+To generate Typedoc documentation:
 
 1. Navigate to the project directory.
 2. Run `npm run doc`.
