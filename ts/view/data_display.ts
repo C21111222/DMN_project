@@ -1,5 +1,5 @@
 import { DMNModel } from "../models/decision_table";
-import {showErrorAlert } from "../utils/alert";
+import { showErrorAlert } from "../utils/alert";
 import { Data } from "../models/data";
 import { extractDecisionById } from "../utils/xml_parser";
 declare const DmnJS: any;
@@ -192,7 +192,9 @@ export class DataDisplay {
     const subtables = document.getElementById(
       "canvas_subtable",
     ) as HTMLDivElement;
-    const subtables_div = Array.from(subtables.getElementsByClassName("subtable"));
+    const subtables_div = Array.from(
+      subtables.getElementsByClassName("subtable"),
+    );
     for (const subtable of subtables_div) {
       subtable.remove();
     }

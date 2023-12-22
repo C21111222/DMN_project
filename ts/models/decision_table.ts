@@ -64,15 +64,14 @@ export class DMNModel {
     }
     try {
       await this.define_dmn_data();
-    }catch (error) {
+    } catch (error) {
       showErrorAlert("Error parsing DMN file", error);
     }
     try {
       this.define_dmn_decision();
       this.define_input_data();
       this.define_output_data();
-    }
-    catch (error) {
+    } catch (error) {
       showErrorAlert("Error defining DMN data", error);
     }
     this.is_init = true;
@@ -339,6 +338,6 @@ export function evaluateDecision(
     results.length > 1
   ) {
     throw new Error("Hit policy violation.");
-  } 
+  }
   return results[0];
 }

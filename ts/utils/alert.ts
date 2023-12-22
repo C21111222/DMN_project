@@ -1,10 +1,9 @@
-/** 
-* alert.ts
-* @description Contains functions for displaying alerts.
-* @module utils/alert
-**/
+/**
+ * alert.ts
+ * @description Contains functions for displaying alerts.
+ * @module utils/alert
+ **/
 import Swal from "sweetalert2";
-
 
 /**
  * Displays an error alert with the specified title and text.

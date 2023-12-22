@@ -1,7 +1,7 @@
 /**
  * @module utils/xml_parser
  * @description This module contains functions for parsing XML.
-  */
+ */
 import { DOMParser, XMLSerializer } from "xmldom";
 
 const parser = new DOMParser();
