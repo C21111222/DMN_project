@@ -1,6 +1,6 @@
 {
     "out": "./docs",
-    "readme": "none",
+    "readme": "./README.md",
     "entryPoints": [
         "./ts/**/*.ts"
     ],
