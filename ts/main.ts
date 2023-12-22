@@ -65,7 +65,14 @@ export async function handleFiles(files: FileList) {
   const file = files[0];
   if (file.name.endsWith(".dmn")) {
     current_run.current_run ? current_run.delete_display() : current_run.current_run = true;
-    await current_run.init(new DMNModel(file));
+    try {
+      await current_run.init(new DMNModel(file));
+    } catch (e) {
+      showErrorAlert("Error", "Failed to parse DMN file. Please check the file format.");
+      current_run.current_run = false;
+      return;
+    }
+    
     define_dmn_object();
     updateForm();
   } else if (file.name.endsWith(".json")) {
@@ -82,6 +89,7 @@ export async function handleFiles(files: FileList) {
         current_run.data_display.hide_result();
         current_run.data_display.display_result(result);
       } catch (e) {
+        showWarningAlert("Warning", "hmm... Are you sure that's a valid JSON file?");
         console.error("Failed to parse JSON or invalid data format:", e);
       }
     };
@@ -101,7 +109,6 @@ export function openForm() {
     // Trigger an error notification if DMN file is not selected first.
     showErrorAlert("Error", "Please select a DMN file first.");
   } else {
-    const table = document.getElementById("input_data_table_form") as HTMLTableElement;
     document.getElementById("inputDataModal")!.style.display = "block";
   }
 }

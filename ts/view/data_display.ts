@@ -188,10 +188,15 @@ export class DataDisplay {
   /**
    * Hides the subtables.
    */
-  public hide_subtables() {
+  public delete_subtables() {
     const subtables = document.getElementById(
       "canvas_subtable",
     ) as HTMLDivElement;
+    const subtables_div = subtables.getElementsByClassName("subtable");
+    for (let i = 0; i < subtables_div.length; i++) {
+      const subtable = subtables_div[i];
+      subtable.remove();
+    }
     subtables.setAttribute("hidden", "");
   }
 
@@ -210,7 +215,7 @@ export class DataDisplay {
     this.clearElementById("input_data_table");
     this.clearElementById("output_data_table");
     this.hide_result();
-    this.hide_subtables();
+    this.delete_subtables();
   }
 
   /**

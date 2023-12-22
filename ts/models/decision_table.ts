@@ -73,7 +73,7 @@ export class DMNModel {
       this.define_output_data();
     }
     catch (error) {
-      showErrorAlert("Error parsing DMN file", error);
+      showErrorAlert("Error defining DMN data", error);
     }
     this.is_init = true;
   }
@@ -113,7 +113,7 @@ export class DMNModel {
       const me: ModdleElement = reader.rootElement;
       this.dmn_data = { ...dmn_file, me: me };
     } catch (error) {
-      showErrorAlert("Error parsing DMN file", error);
+      throw new Error("Error parsing DMN file: " + error);
     }
   }
 
@@ -209,7 +209,7 @@ type ResultType = Record<string, string>;
  * @param decision_table - The decision table to evaluate.
  * @param json - The JSON input data.
  * @returns The result of the evaluation.
- * @throws Error if the decision table is not initialized or if there is a hit policy violation.
+ * @throws Error if the decision table is not initialized or if there is a hit policy violation or if no result is found.
  */
 export function evaluateDecisionTable(
   dmnmodel: DMNModel,
@@ -247,6 +247,9 @@ export function evaluateDecisionTable(
     }
   });
   if (results.length === 1) {
+    if (Object.keys(results[0]).length === 0) {
+      throw new Error("No result found.");
+    }
     return results[0];
   } else {
     let result: Record<string, any> = {};
@@ -336,6 +339,6 @@ export function evaluateDecision(
     results.length > 1
   ) {
     throw new Error("Hit policy violation.");
-  }
+  } 
   return results[0];
 }
