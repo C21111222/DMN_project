@@ -162,7 +162,7 @@ export class DataDisplay {
   }
 
   /**
-   * Affiche le résultat en rendant visible l'élément de tableau spécifié.
+   * Displays the result by setting the display style of the output_data_div table element to "block".
    */
   public show_result() {
     const table_div = document.getElementById(

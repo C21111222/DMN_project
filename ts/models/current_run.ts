@@ -1,3 +1,10 @@
+/**
+ * @description
+ * This file defines the CurrentRun class which represents the state of a process run,
+ * including its decision model, input data, and data display.
+ *
+ * @module models/current_run
+ */
 import { DMNModel } from "./decision_table";
 import { DataDisplay } from "../view/data_display";
 

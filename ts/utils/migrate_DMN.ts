@@ -1,7 +1,8 @@
 /**
- * This file contains the migration logic for DMN diagrams based on https://github.com/bpmn-io/dmn-migrate
+ * @description This file contains the migration logic for DMN diagrams based on https://github.com/bpmn-io/dmn-migrate
  * - migrateDiagram
  * - needsMigration
+ * @module utils/migrate_DMN
  */
 import Ids from "ids";
 

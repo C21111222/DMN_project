@@ -1,8 +1,12 @@
 /**
- * Imports necessary modules and initializes the application.
- * Handles file drop, file selection, form submission, and form display.
- * Provides functions for handling DMN and JSON files, updating the form, and displaying results.
- * Supports dragging and moving the modal window.
+ * Main Application Entry Point
+ * @description
+ * This file contains the main logic for initializing the application, handling user interactions,
+ * and managing the state of the application. It includes event listeners for file drag-and-drop,
+ * file selection, form submission, and modal interactions. It also defines the behavior for
+ * processing DMN and JSON files, updating the user interface, and displaying results.
+ * 
+ * @module MainApplication
  */
 import {DMNModel, evaluateDecisionTable} from "./models/decision_table";
 import {CurrentRun} from "./models/current_run";
@@ -57,7 +61,7 @@ fileInput.addEventListener("change", (e) => {
  * Displays the result or shows an error if the file format is incorrect or no DMN model is selected.
  * @param {FileList} files - The list of files dropped or selected by the user.
  */
-async function handleFiles(files: FileList) {
+export async function handleFiles(files: FileList) {
   const file = files[0];
   if (file.name.endsWith(".dmn")) {
     current_run.current_run ? current_run.delete_display() : current_run.current_run = true;
@@ -92,7 +96,7 @@ async function handleFiles(files: FileList) {
  * If the current run is false, triggers an error notification if DMN file is not selected first.
  * Otherwise, displays the input data table form.
  */
-function openForm() {
+export function openForm() {
   if (current_run.current_run == false) {
     // Trigger an error notification if DMN file is not selected first.
     showErrorAlert("Error", "Please select a DMN file first.");
@@ -107,7 +111,7 @@ function openForm() {
  * It clears the existing form, iterates over the input data definitions,
  * and creates corresponding form elements with appropriate attributes and identifiers.
  */
-function updateForm() {
+export function updateForm() {
   const table = document.getElementById("input_data_table_form") as HTMLTableElement;
   table.innerHTML = "";
   current_run.dmn_model.dmn_input_data.forEach(inputData => {
@@ -143,7 +147,7 @@ function updateForm() {
  * It collects the input data from the form, creates a JSON object,
  * evaluates the decision table with the input data, and displays the result.
  */
-function submitForm() {
+export function submitForm() {
   const json = Array.from(current_run.dmn_model.dmn_input_data).reduce((acc, input_data) => {
     const input = document.getElementById(input_data.name) as HTMLInputElement;
     acc[input_data.name] = input.value;
@@ -178,7 +182,7 @@ modals.forEach(modal => {
  * and displays the corresponding decision table. It also sets up the close button to hide
  * the decision tables and all its children.
  */
-function define_dmn_object(){
+export function define_dmn_object(){
   const dmn_objects = document.getElementsByClassName("djs-element djs-shape");
   const dmn_decisions_id = current_run.dmn_model.dmn_decision.map((decision) => decision.id);
   const parent = document.getElementById("subtables")!;

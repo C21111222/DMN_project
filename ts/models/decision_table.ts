@@ -1,3 +1,10 @@
+/**
+ * @description
+ * This file defines the DMNModel class and related functions for evaluating decision tables.
+ * It includes the logic for initializing the model, parsing DMN files, and evaluating decisions.
+ *
+ * @module models/decision_table
+ */
 import {
   is_DMN_LiteralExpression,
   DMN_Decision,

@@ -1,4 +1,7 @@
-// Purpose: Model for data.
+/**
+ * @description The module for the Data class.
+ * @module models/data
+ */
 
 /**
  * Represents data.

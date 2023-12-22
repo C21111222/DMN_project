@@ -1,6 +1,6 @@
 /**
- * This script creates an animation effect where elements on the page
- * designated as 'eyes' will follow the mouse cursor as it moves.
+ * @description This script creates an animation effect where elements on the page designated as 'eyes' will follow the mouse cursor as it moves.
+ * @module animation/eyes_movements
  */
 
 /** Flag to indicate if the eye positions have been set. */

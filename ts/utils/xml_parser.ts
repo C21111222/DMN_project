@@ -1,6 +1,18 @@
+/**
+ * @module utils/xml_parser
+ * @description This module contains functions for parsing XML.
+  */
 import { DOMParser, XMLSerializer } from "xmldom";
 
 const parser = new DOMParser();
+/**
+ * Extracts a specific decision element from a DMN XML string by its ID.
+ *
+ * @param {string} xmlString - The DMN XML as a string.
+ * @param {string} decisionId - The ID of the decision element to extract.
+ * @returns {string | null} - The XML string containing only the specified decision element,
+ *                            or null if the decision ID is not found.
+ */
 export function extractDecisionById(
   xmlString: string,
   decisionId: string,
@@ -9,7 +21,7 @@ export function extractDecisionById(
   const decisions = doc.getElementsByTagName("decision");
   const definitions = doc.getElementsByTagName("definitions")[0];
 
-  // Trouver la balise <decision> avec l'ID spécifié
+  // Find the <decision> tag with the specified ID
   let targetDecision: Element | null = null;
   for (let i = 0; i < decisions.length; i++) {
     if (decisions[i].getAttribute("id") === decisionId) {
@@ -19,28 +31,17 @@ export function extractDecisionById(
   }
 
   if (targetDecision && definitions) {
-    // Supprimer toutes les balises enfants de <definitions> sauf la <decision> ciblée
+    // Remove all child tags of <definitions> except the targeted <decision>
     Array.from(definitions.childNodes).forEach((child) => {
       if (child !== targetDecision) {
         definitions.removeChild(child);
       }
     });
 
-    // Serialiser le document modifié en chaîne XML
+    // Serialize the modified document to an XML string
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   }
 
-  return null; // Retourner null si l'ID de décision n'est pas trouvé
-}
-
-// functio nthat define if the file is a single table or a multiple table thanks to <dmndi:DMNDI>
-export function isSingleTable(xmlString: string): boolean {
-  const doc = parser.parseFromString(xmlString, "text/xml");
-  const dmndi = doc.getElementsByTagName("dmndi");
-
-  if (dmndi.length > 0) {
-    return false;
-  }
-  return true;
+  return null; // Return null if the decision ID is not found
 }

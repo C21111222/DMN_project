@@ -1,9 +1,15 @@
+/** 
+* alert.ts
+* @description Contains functions for displaying alerts.
+* @module utils/alert
+**/
 import Swal from "sweetalert2";
 
+
 /**
- * Affiche une alerte d'erreur avec un titre et un texte donnés.
- * @param title Le titre de l'alerte d'erreur.
- * @param text Le texte de l'alerte d'erreur.
+ * Displays an error alert with the specified title and text.
+ * @param title - The title of the alert.
+ * @param text - The text of the alert.
  */
 export function showErrorAlert(title: string, text: string): void {
   Swal.fire({
@@ -14,9 +20,9 @@ export function showErrorAlert(title: string, text: string): void {
 }
 
 /**
- * Affiche une alerte de succès avec un titre et un texte donnés.
- * @param title Le titre de l'alerte.
- * @param text Le texte de l'alerte.
+ * Displays a success alert with the specified title and text.
+ * @param title - The title of the alert.
+ * @param text - The text of the alert.
  */
 export function showSuccessAlert(title: string, text: string): void {
   Swal.fire({
@@ -27,9 +33,9 @@ export function showSuccessAlert(title: string, text: string): void {
 }
 
 /**
- * Affiche une alerte de type avertissement avec un titre et un texte donnés.
- * @param title Le titre de l'alerte.
- * @param text Le texte de l'alerte.
+ * Displays a warning alert with the specified title and text.
+ * @param title - The title of the alert.
+ * @param text - The text of the alert.
  */
 export function showWarningAlert(title: string, text: string): void {
   Swal.fire({
